@@ -22,6 +22,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          glow: "hsl(var(--primary-glow))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -38,6 +39,7 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          glow: "hsl(var(--accent-glow))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -46,6 +48,23 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        // Steampunk colors
+        copper: {
+          DEFAULT: "hsl(var(--copper))",
+          dark: "hsl(var(--copper-dark))",
+        },
+        brass: {
+          DEFAULT: "hsl(var(--brass))",
+          dark: "hsl(var(--brass-dark))",
+        },
+        bronze: "hsl(var(--bronze))",
+        iron: "hsl(var(--iron))",
+        steel: "hsl(var(--steel))",
+        neon: {
+          green: "hsl(var(--neon-green))",
+          blue: "hsl(var(--neon-blue))",
+          orange: "hsl(var(--neon-orange))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

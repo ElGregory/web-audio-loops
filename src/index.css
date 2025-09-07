@@ -8,34 +8,67 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Steampunk color palette */
+    --background: 20 8% 8%;
+    --foreground: 35 25% 85%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 25 15% 12%;
+    --card-foreground: 35 25% 85%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 25 15% 12%;
+    --popover-foreground: 35 25% 85%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Brass/Copper primary */
+    --primary: 35 65% 55%;
+    --primary-foreground: 20 8% 8%;
+    --primary-glow: 35 75% 65%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Dark bronze secondary */
+    --secondary: 25 25% 20%;
+    --secondary-foreground: 35 25% 85%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 25 15% 15%;
+    --muted-foreground: 35 15% 60%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Neon accent */
+    --accent: 140 85% 55%;
+    --accent-foreground: 20 8% 8%;
+    --accent-glow: 140 90% 65%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 35 25% 85%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 25 25% 25%;
+    --input: 25 25% 18%;
+    --ring: 35 65% 55%;
 
+    /* Custom steampunk tokens */
+    --copper: 25 65% 45%;
+    --copper-dark: 25 55% 35%;
+    --brass: 45 75% 55%;
+    --brass-dark: 45 65% 45%;
+    --bronze: 30 45% 35%;
+    --iron: 220 15% 25%;
+    --steel: 220 15% 45%;
+    
+    /* Neon colors */
+    --neon-green: 140 85% 55%;
+    --neon-blue: 195 95% 65%;
+    --neon-orange: 25 95% 65%;
+    
+    /* Gradients */
+    --gradient-brass: linear-gradient(135deg, hsl(var(--brass)), hsl(var(--brass-dark)));
+    --gradient-copper: linear-gradient(135deg, hsl(var(--copper)), hsl(var(--copper-dark)));
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)));
+    --gradient-dark: linear-gradient(135deg, hsl(var(--background)), hsl(var(--muted)));
+    
+    /* Effects */
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
+    --shadow-accent-glow: 0 0 20px hsl(var(--accent) / 0.4);
+    --shadow-inset: inset 0 2px 4px rgba(0,0,0,0.3);
+    --shadow-raised: 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
@@ -101,5 +134,71 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /* Steampunk component styles */
+  .knob {
+    @apply relative w-16 h-16 rounded-full cursor-pointer;
+    background: var(--gradient-brass);
+    box-shadow: var(--shadow-raised);
+    border: 2px solid hsl(var(--border));
+  }
+  
+  .knob:hover {
+    box-shadow: var(--shadow-glow), var(--shadow-raised);
+  }
+  
+  .knob-indicator {
+    @apply absolute w-1 h-6 bg-foreground rounded-full;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    transform-origin: center 24px;
+  }
+  
+  .panel {
+    @apply rounded-lg border-2 border-border p-6;
+    background: var(--gradient-dark);
+    box-shadow: var(--shadow-inset);
+  }
+  
+  .panel-header {
+    @apply flex items-center gap-2 mb-4 pb-2 border-b border-border;
+  }
+  
+  .neon-text {
+    color: hsl(var(--accent));
+    text-shadow: 0 0 10px hsl(var(--accent) / 0.5);
+  }
+  
+  .sequencer-step {
+    @apply w-12 h-12 rounded border-2 border-border cursor-pointer transition-all;
+    background: var(--gradient-dark);
+    box-shadow: var(--shadow-inset);
+  }
+  
+  .sequencer-step.active {
+    background: var(--gradient-accent);
+    box-shadow: var(--shadow-accent-glow);
+    border-color: hsl(var(--accent));
+  }
+  
+  .sequencer-step.playing {
+    @apply animate-pulse;
+    box-shadow: var(--shadow-accent-glow), 0 0 30px hsl(var(--accent) / 0.6);
+  }
+  
+  .waveform-container {
+    @apply rounded border-2 border-border p-4;
+    background: radial-gradient(circle at center, hsl(var(--muted)) 0%, hsl(var(--background)) 100%);
+    box-shadow: var(--shadow-inset);
+  }
+  
+  .control-section {
+    @apply panel;
+    min-height: 200px;
   }
 }
