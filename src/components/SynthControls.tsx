@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Knob } from "./Knob";
+import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AudioParams } from "@/hooks/useAudioEngine";
@@ -33,14 +33,18 @@ export const SynthControls = ({ params, onParamsChange, onPlayNote, className }:
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <Knob
-          label="Frequency"
-          value={params.frequency}
-          onChange={(value) => updateParam('frequency', value)}
-          min={20}
-          max={2000}
-          step={1}
-        />
+        <div className="flex flex-col items-center gap-2">
+          <label className="text-xs text-muted-foreground font-medium">Frequency</label>
+          <Slider
+            value={[params.frequency]}
+            onValueChange={(value) => updateParam('frequency', value[0])}
+            min={20}
+            max={2000}
+            step={1}
+            className="w-20"
+          />
+          <span className="text-xs neon-text font-mono">{params.frequency}</span>
+        </div>
         
         <div className="flex flex-col items-center gap-2">
           <label className="text-xs text-muted-foreground font-medium">Waveform</label>
@@ -57,14 +61,18 @@ export const SynthControls = ({ params, onParamsChange, onPlayNote, className }:
           </Select>
         </div>
 
-        <Knob
-          label="Volume"
-          value={params.volume * 100}
-          onChange={(value) => updateParam('volume', value / 100)}
-          min={0}
-          max={100}
-          step={1}
-        />
+        <div className="flex flex-col items-center gap-2">
+          <label className="text-xs text-muted-foreground font-medium">Volume</label>
+          <Slider
+            value={[params.volume * 100]}
+            onValueChange={(value) => updateParam('volume', value[0] / 100)}
+            min={0}
+            max={100}
+            step={1}
+            className="w-20"
+          />
+          <span className="text-xs neon-text font-mono">{Math.round(params.volume * 100)}</span>
+        </div>
       </div>
 
       <div className="panel-header">
@@ -73,45 +81,57 @@ export const SynthControls = ({ params, onParamsChange, onPlayNote, className }:
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Knob
-          label="Attack"
-          value={params.attack}
-          onChange={(value) => updateParam('attack', value)}
-          min={1}
-          max={1000}
-          step={1}
-          size="sm"
-        />
+        <div className="flex flex-col items-center gap-2">
+          <label className="text-xs text-muted-foreground font-medium">Attack</label>
+          <Slider
+            value={[params.attack]}
+            onValueChange={(value) => updateParam('attack', value[0])}
+            min={1}
+            max={1000}
+            step={1}
+            className="w-16"
+          />
+          <span className="text-xs neon-text font-mono">{params.attack}</span>
+        </div>
         
-        <Knob
-          label="Decay" 
-          value={params.decay}
-          onChange={(value) => updateParam('decay', value)}
-          min={1}
-          max={1000}
-          step={1}
-          size="sm"
-        />
+        <div className="flex flex-col items-center gap-2">
+          <label className="text-xs text-muted-foreground font-medium">Decay</label>
+          <Slider
+            value={[params.decay]}
+            onValueChange={(value) => updateParam('decay', value[0])}
+            min={1}
+            max={1000}
+            step={1}
+            className="w-16"
+          />
+          <span className="text-xs neon-text font-mono">{params.decay}</span>
+        </div>
         
-        <Knob
-          label="Sustain"
-          value={params.sustain * 100}
-          onChange={(value) => updateParam('sustain', value / 100)}
-          min={0}
-          max={100}
-          step={1}
-          size="sm"
-        />
+        <div className="flex flex-col items-center gap-2">
+          <label className="text-xs text-muted-foreground font-medium">Sustain</label>
+          <Slider
+            value={[params.sustain * 100]}
+            onValueChange={(value) => updateParam('sustain', value[0] / 100)}
+            min={0}
+            max={100}
+            step={1}
+            className="w-16"
+          />
+          <span className="text-xs neon-text font-mono">{Math.round(params.sustain * 100)}</span>
+        </div>
         
-        <Knob
-          label="Release"
-          value={params.release}
-          onChange={(value) => updateParam('release', value)}
-          min={1}
-          max={2000}
-          step={1}
-          size="sm"
-        />
+        <div className="flex flex-col items-center gap-2">
+          <label className="text-xs text-muted-foreground font-medium">Release</label>
+          <Slider
+            value={[params.release]}
+            onValueChange={(value) => updateParam('release', value[0])}
+            min={1}
+            max={2000}
+            step={1}
+            className="w-16"
+          />
+          <span className="text-xs neon-text font-mono">{params.release}</span>
+        </div>
       </div>
 
       <div className="panel-header">
@@ -120,45 +140,57 @@ export const SynthControls = ({ params, onParamsChange, onPlayNote, className }:
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Knob
-          label="Filter Freq"
-          value={params.filterFreq}
-          onChange={(value) => updateParam('filterFreq', value)}
-          min={20}
-          max={8000}
-          step={10}
-          size="sm"
-        />
+        <div className="flex flex-col items-center gap-2">
+          <label className="text-xs text-muted-foreground font-medium">Filter Freq</label>
+          <Slider
+            value={[params.filterFreq]}
+            onValueChange={(value) => updateParam('filterFreq', value[0])}
+            min={20}
+            max={8000}
+            step={10}
+            className="w-16"
+          />
+          <span className="text-xs neon-text font-mono">{params.filterFreq}</span>
+        </div>
         
-        <Knob
-          label="Filter Q"
-          value={params.filterQ}
-          onChange={(value) => updateParam('filterQ', value)}
-          min={0.1}
-          max={30}
-          step={0.1}
-          size="sm"
-        />
+        <div className="flex flex-col items-center gap-2">
+          <label className="text-xs text-muted-foreground font-medium">Filter Q</label>
+          <Slider
+            value={[params.filterQ]}
+            onValueChange={(value) => updateParam('filterQ', value[0])}
+            min={0.1}
+            max={30}
+            step={0.1}
+            className="w-16"
+          />
+          <span className="text-xs neon-text font-mono">{params.filterQ.toFixed(1)}</span>
+        </div>
         
-        <Knob
-          label="Delay"
-          value={params.delay * 1000}
-          onChange={(value) => updateParam('delay', value / 1000)}
-          min={0}
-          max={500}
-          step={1}
-          size="sm"
-        />
+        <div className="flex flex-col items-center gap-2">
+          <label className="text-xs text-muted-foreground font-medium">Delay</label>
+          <Slider
+            value={[params.delay * 1000]}
+            onValueChange={(value) => updateParam('delay', value[0] / 1000)}
+            min={0}
+            max={500}
+            step={1}
+            className="w-16"
+          />
+          <span className="text-xs neon-text font-mono">{Math.round(params.delay * 1000)}</span>
+        </div>
         
-        <Knob
-          label="Reverb"
-          value={params.reverb * 100}
-          onChange={(value) => updateParam('reverb', value / 100)}
-          min={0}
-          max={100}
-          step={1}
-          size="sm"
-        />
+        <div className="flex flex-col items-center gap-2">
+          <label className="text-xs text-muted-foreground font-medium">Reverb</label>
+          <Slider
+            value={[params.reverb * 100]}
+            onValueChange={(value) => updateParam('reverb', value[0] / 100)}
+            min={0}
+            max={100}
+            step={1}
+            className="w-16"
+          />
+          <span className="text-xs neon-text font-mono">{Math.round(params.reverb * 100)}</span>
+        </div>
       </div>
     </div>
   );
