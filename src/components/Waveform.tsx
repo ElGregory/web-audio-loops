@@ -20,11 +20,6 @@ export const Waveform = ({ audioContext, analyserNode, isPlaying, className }: W
     const dataArray = new Uint8Array(bufferLength);
 
     const draw = () => {
-      if (!isPlaying) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        return;
-      }
-
       analyserNode.getByteTimeDomainData(dataArray);
 
       ctx.fillStyle = 'hsl(var(--background))';
@@ -64,10 +59,10 @@ export const Waveform = ({ audioContext, analyserNode, isPlaying, className }: W
 
       ctx.shadowBlur = 5;
       
-      for (let i = 0; i < bufferLength / 4; i++) {
-        const barHeight = (dataArray[i] / 255) * canvas.height * 0.3;
+      for (let i = 0; i < bufferLength / 8; i++) {
+        const barHeight = (dataArray[i] / 255) * canvas.height * 0.4;
         
-        const hue = (i / bufferLength) * 360;
+        const hue = (i / (bufferLength / 8)) * 360;
         ctx.fillStyle = `hsla(${hue}, 80%, 60%, 0.6)`;
         
         ctx.fillRect(barX, canvas.height - barHeight, barWidth, barHeight);
@@ -77,18 +72,15 @@ export const Waveform = ({ audioContext, analyserNode, isPlaying, className }: W
       animationRef.current = requestAnimationFrame(draw);
     };
 
-    if (isPlaying) {
-      draw();
-    } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
+    // Start continuous drawing
+    draw();
 
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [analyserNode, isPlaying]);
+  }, [analyserNode]);
 
   return (
     <div className="waveform-container">
