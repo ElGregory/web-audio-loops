@@ -35,29 +35,27 @@ export const Knob = ({
     lg: "w-20 h-20"
   };
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    setIsDragging(true);
-    startY.current = e.clientY;
-    startValue.current = value;
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  }, [value]);
-
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
-    
     const deltaY = startY.current - e.clientY;
     const sensitivity = (max - min) / 200;
     const newValue = Math.max(min, Math.min(max, startValue.current + deltaY * sensitivity));
     
     onChange(Math.round(newValue / step) * step);
-  }, [isDragging, max, min, step, onChange]);
+  }, [max, min, step, onChange]);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
   }, [handleMouseMove]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    setIsDragging(true);
+    startY.current = e.clientY;
+    startValue.current = value;
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [value, handleMouseMove, handleMouseUp]);
 
   return (
     <div className="flex flex-col items-center gap-2">
