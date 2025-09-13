@@ -11,7 +11,7 @@ import { Zap, Settings, Save, Share } from "lucide-react";
 import { toast } from "sonner";
 
 const Index = () => {
-  const { audioContext, analyser, isInitialized, initializeAudio, playTone, startSustainedTone, stopSustainedTone, updateMasterVolume } = useAudioEngine();
+  const { audioContext, analyser, isInitialized, initializeAudio, playTone, updateMasterVolume } = useAudioEngine();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(-1);
   const [globalSequencerPlaying, setGlobalSequencerPlaying] = useState(false);
@@ -89,15 +89,11 @@ const Index = () => {
       return;
     }
     
+    setIsPlaying(true);
     const adjustedParams = { ...track.params, volume: track.params.volume * track.volume };
-    
-    if (track.isPlaying) {
-      startSustainedTone(track.id, adjustedParams);
-      toast(`Started ${track.name}`);
-    } else {
-      stopSustainedTone(track.id);
-      toast(`Stopped ${track.name}`);
-    }
+    playTone(adjustedParams, 0.5);
+    setTimeout(() => setIsPlaying(false), 500);
+    toast(`Playing ${track.name}`);
   };
 
   const handleTrackEdit = (track: Track) => {

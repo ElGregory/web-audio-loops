@@ -8,7 +8,6 @@ export interface Track {
   solo: boolean;
   volume: number;
   steps: boolean[];
-  isPlaying: boolean;
 }
 
 export interface TrackPreset {

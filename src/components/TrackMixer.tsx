@@ -6,7 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Copy, Trash2, Volume2, VolumeX, Play, Settings, Square, Pause } from 'lucide-react';
+import { Plus, Copy, Trash2, Volume2, VolumeX, Play, Settings } from 'lucide-react';
 import { TrackSequencer } from '@/components/TrackSequencer';
 import { AudioParams } from '@/hooks/useAudioEngine';
 import { toast } from 'sonner';
@@ -48,7 +48,6 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
       solo: false,
       volume: 0.8,
       steps: new Array(8).fill(false),
-      isPlaying: false,
     };
     onTracksChange([...tracks, newTrack]);
     toast(`Added ${newTrack.name}`);
@@ -98,49 +97,6 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
     updateTrack(trackId, { steps });
   };
 
-  const applyPresetToTrack = (trackId: string, presetName: string) => {
-    const preset = allPresets.find(p => p.name === presetName);
-    if (preset) {
-      updateTrack(trackId, { 
-        params: preset.params,
-        name: preset.name 
-      });
-      toast(`Applied ${preset.name} preset`);
-    }
-  };
-
-  const toggleTrackPlay = (trackId: string) => {
-    const track = tracks.find(t => t.id === trackId);
-    if (track) {
-      updateTrack(trackId, { isPlaying: !track.isPlaying });
-      if (!track.isPlaying) {
-        onTrackPlay(track);
-      }
-    }
-  };
-
-  const playAllTracks = () => {
-    const tracksToPlay = tracks.filter(track => {
-      const hasSoloTracks = tracks.some(t => t.solo);
-      return hasSoloTracks ? track.solo && !track.muted : !track.muted;
-    });
-    
-    tracksToPlay.forEach(track => {
-      updateTrack(track.id, { isPlaying: true });
-      onTrackPlay(track);
-    });
-    toast(`Playing ${tracksToPlay.length} tracks concurrently`);
-  };
-
-  const stopAllTracks = () => {
-    tracks.forEach(track => {
-      if (track.isPlaying) {
-        updateTrack(track.id, { isPlaying: false });
-      }
-    });
-    toast("Stopped all tracks");
-  };
-
   const addPresetTrack = () => {
     if (!selectedPreset) return;
     const preset = allPresets.find(p => p.name === selectedPreset);
@@ -156,22 +112,6 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
         <Settings className="w-5 h-5 text-accent" />
         <h3 className="text-lg font-bold neon-text">Multi-Track Mixer</h3>
         <div className="ml-auto flex gap-2">
-          <Button 
-            onClick={playAllTracks}
-            size="sm"
-            className="bg-primary hover:bg-primary/80"
-          >
-            <Play className="w-4 h-4 mr-1" />
-            Play All
-          </Button>
-          <Button 
-            onClick={stopAllTracks}
-            variant="outline"
-            size="sm"
-          >
-            <Square className="w-4 h-4 mr-1" />
-            Stop All
-          </Button>
           <Select value={selectedPreset} onValueChange={setSelectedPreset}>
             <SelectTrigger className="w-48 bg-secondary">
               <SelectValue placeholder="Roland Presets" />
@@ -241,92 +181,59 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="space-y-4">
-                  {/* Preset Selector */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground min-w-16">Preset:</span>
-                    <Select onValueChange={(value) => applyPresetToTrack(track.id, value)}>
-                      <SelectTrigger className="flex-1 h-8 text-xs bg-background/50">
-                        <SelectValue placeholder="Change preset..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ROLAND_303_PRESETS.map((preset) => (
-                          <SelectItem key={preset.name} value={preset.name}>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs">303</Badge>
-                              {preset.name}
-                            </div>
-                          </SelectItem>
-                        ))}
-                        {ROLAND_909_PRESETS.map((preset) => (
-                          <SelectItem key={preset.name} value={preset.name}>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs">909</Badge>
-                              {preset.name}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs text-muted-foreground min-w-16">Volume</span>
+                      <Slider
+                        value={[track.volume * 100]}
+                        onValueChange={(value) => updateTrackVolume(track.id, value[0] / 100)}
+                        min={0}
+                        max={100}
+                        step={1}
+                        className="flex-1"
+                      />
+                      <span className="text-xs neon-text font-mono min-w-8">
+                        {Math.round(track.volume * 100)}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {track.params.waveform} • {track.params.frequency}Hz • Filter: {track.params.filterFreq}Hz
+                    </div>
                   </div>
-
-                  {/* Volume Control */}
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs text-muted-foreground min-w-16">Volume</span>
-                        <Slider
-                          value={[track.volume * 100]}
-                          onValueChange={(value) => updateTrackVolume(track.id, value[0] / 100)}
-                          min={0}
-                          max={100}
-                          step={1}
-                          className="flex-1"
-                        />
-                        <span className="text-xs neon-text font-mono min-w-8">
-                          {Math.round(track.volume * 100)}
-                        </span>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {track.params.waveform} • {track.params.frequency}Hz • Filter: {track.params.filterFreq}Hz
-                      </div>
-                    </div>
-                    
-                    {/* Action Buttons */}
-                    <div className="flex gap-2">
-                      <Button
-                        variant={track.isPlaying ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleTrackPlay(track.id)}
-                        className="h-8 px-2"
-                      >
-                        {track.isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onTrackEdit(track)}
-                        className="h-8 px-2"
-                      >
-                        <Settings className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => cloneTrack(track)}
-                        className="h-8 px-2"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteTrack(track.id)}
-                        className="h-8 px-2 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onTrackPlay(track)}
+                      className="h-8 px-2"
+                    >
+                      <Play className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onTrackEdit(track)}
+                      className="h-8 px-2"
+                    >
+                      <Settings className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => cloneTrack(track)}
+                      className="h-8 px-2"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => deleteTrack(track.id)}
+                      className="h-8 px-2 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
                 
