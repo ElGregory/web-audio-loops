@@ -7,6 +7,7 @@ export interface Track {
   muted: boolean;
   solo: boolean;
   volume: number;
+  steps: boolean[];
 }
 
 export interface TrackPreset {

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Copy, Trash2, Volume2, VolumeX, Play, Settings } from 'lucide-react';
+import { TrackSequencer } from '@/components/TrackSequencer';
 import { AudioParams } from '@/hooks/useAudioEngine';
 import { toast } from 'sonner';
 
@@ -15,10 +16,13 @@ interface TrackMixerProps {
   onTracksChange: (tracks: Track[]) => void;
   onTrackPlay: (track: Track) => void;
   onTrackEdit: (track: Track) => void;
+  isPlaying: boolean;
+  currentStep: number;
+  onSequencerPlay: (trackId: string) => void;
   className?: string;
 }
 
-export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, className }: TrackMixerProps) => {
+export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, isPlaying, currentStep, onSequencerPlay, className }: TrackMixerProps) => {
   const [selectedPreset, setSelectedPreset] = useState<string>('');
 
   const allPresets: TrackPreset[] = [...ROLAND_303_PRESETS, ...ROLAND_909_PRESETS];
@@ -43,6 +47,7 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, c
       muted: false,
       solo: false,
       volume: 0.8,
+      steps: new Array(8).fill(false),
     };
     onTracksChange([...tracks, newTrack]);
     toast(`Added ${newTrack.name}`);
@@ -86,6 +91,10 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, c
 
   const updateTrackVolume = (trackId: string, volume: number) => {
     updateTrack(trackId, { volume });
+  };
+
+  const updateTrackSteps = (trackId: string, steps: boolean[]) => {
+    updateTrack(trackId, { steps });
   };
 
   const addPresetTrack = () => {
@@ -226,6 +235,16 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, c
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
+                </div>
+                
+                <div className="mt-4 pt-4 border-t border-border">
+                  <TrackSequencer
+                    steps={track.steps}
+                    isPlaying={isPlaying}
+                    currentStep={currentStep}
+                    onStepsChange={(steps) => updateTrackSteps(track.id, steps)}
+                    onPlay={() => onSequencerPlay(track.id)}
+                  />
                 </div>
               </CardContent>
             </Card>

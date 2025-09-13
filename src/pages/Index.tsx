@@ -13,6 +13,8 @@ import { toast } from "sonner";
 const Index = () => {
   const { audioContext, analyser, isInitialized, initializeAudio, playTone, updateMasterVolume } = useAudioEngine();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentStep, setCurrentStep] = useState(-1);
+  const [globalSequencerPlaying, setGlobalSequencerPlaying] = useState(false);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [editingTrack, setEditingTrack] = useState<Track | null>(null);
   const [isTrackEditorOpen, setIsTrackEditorOpen] = useState(false);
@@ -49,21 +51,35 @@ const Index = () => {
   };
 
   const handleSequencerStep = (step: number, isActive: boolean) => {
+    setCurrentStep(step);
     if (isActive && isInitialized) {
-      // Play all unmuted, non-solo tracks (or only solo tracks if any)
+      // Play tracks that have this step active
       const tracksToPlay = tracks.filter(track => {
         const hasSoloTracks = tracks.some(t => t.solo);
-        if (hasSoloTracks) {
-          return track.solo && !track.muted;
-        }
-        return !track.muted;
+        const shouldPlay = hasSoloTracks ? track.solo && !track.muted : !track.muted;
+        return shouldPlay && track.steps[step];
       });
 
       tracksToPlay.forEach(track => {
-        const stepFreq = track.params.frequency * Math.pow(2, (step - 4) / 12);
-        const stepParams = { ...track.params, frequency: stepFreq, volume: track.params.volume * track.volume };
-        playTone(stepParams, 0.2);
+        const adjustedParams = { ...track.params, volume: track.params.volume * track.volume };
+        playTone(adjustedParams, 0.2);
       });
+    }
+  };
+
+  const handleTrackSequencerPlay = (trackId: string) => {
+    if (!isInitialized) {
+      toast("Initialize audio first!");
+      return;
+    }
+    
+    const track = tracks.find(t => t.id === trackId);
+    if (track) {
+      setIsPlaying(true);
+      const adjustedParams = { ...track.params, volume: track.params.volume * track.volume };
+      playTone(adjustedParams, 0.5);
+      setTimeout(() => setIsPlaying(false), 500);
+      toast(`Playing ${track.name}`);
     }
   };
 
@@ -159,6 +175,9 @@ const Index = () => {
               onTracksChange={setTracks}
               onTrackPlay={handleTrackPlay}
               onTrackEdit={handleTrackEdit}
+              isPlaying={globalSequencerPlaying}
+              currentStep={currentStep}
+              onSequencerPlay={handleTrackSequencerPlay}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -174,6 +193,20 @@ const Index = () => {
                   bpm={120}
                   onStepPlay={handleSequencerStep}
                 />
+                
+                <div className="control-section">
+                  <div className="panel-header">
+                    <h3 className="text-lg font-bold neon-text">Global Sequencer</h3>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setGlobalSequencerPlaying(!globalSequencerPlaying)}
+                      className="ml-auto"
+                    >
+                      {globalSequencerPlaying ? "Stop" : "Start"} All Tracks
+                    </Button>
+                  </div>
+                </div>
               </div>
 
               {/* Right Column */}
