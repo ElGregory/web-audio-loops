@@ -60,6 +60,8 @@ export const useAudioEngine = () => {
       // Set up audio chain
       masterGain.connect(filter);
       filter.connect(delay);
+      // Add a dry path to analyser to avoid silent output if delay behaves unexpectedly
+      filter.connect(analyser);
       delay.connect(analyser);
       analyser.connect(ctx.destination);
       
