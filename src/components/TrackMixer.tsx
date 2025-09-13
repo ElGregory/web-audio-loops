@@ -108,7 +108,6 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, c
               <SelectValue placeholder="Roland Presets" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="" disabled>Select Preset</SelectItem>
               {ROLAND_303_PRESETS.map((preset) => (
                 <SelectItem key={preset.name} value={preset.name}>
                   <div className="flex items-center gap-2">
