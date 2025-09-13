@@ -22,6 +22,7 @@ export const useAudioEngine = () => {
   const delayRef = useRef<DelayNode>();
   const reverbRef = useRef<ConvolverNode>();
   const filterRef = useRef<BiquadFilterNode>();
+  const activeOscillatorsRef = useRef<Map<string, { oscillator: OscillatorNode; gainNode: GainNode }>>(new Map());
 
   const initializeAudio = useCallback(async () => {
     if (audioContext) return;
@@ -107,6 +108,66 @@ export const useAudioEngine = () => {
     return oscillator;
   }, [audioContext]);
 
+  const startSustainedTone = useCallback((trackId: string, params: AudioParams) => {
+    if (!audioContext || !masterGainRef.current) return;
+
+    // Stop existing oscillator for this track if any
+    stopSustainedTone(trackId);
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    // Configure oscillator
+    oscillator.type = params.waveform;
+    oscillator.frequency.setValueAtTime(params.frequency, audioContext.currentTime);
+    
+    // Configure envelope for sustained play
+    const now = audioContext.currentTime;
+    const attackTime = params.attack / 1000;
+    const decayTime = params.decay / 1000;
+    
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(params.volume, now + attackTime);
+    gainNode.gain.linearRampToValueAtTime(params.sustain * params.volume, now + attackTime + decayTime);
+    
+    // Update filter parameters
+    if (filterRef.current) {
+      filterRef.current.frequency.setValueAtTime(params.filterFreq, now);
+      filterRef.current.Q.setValueAtTime(params.filterQ, now);
+    }
+    
+    // Update delay
+    if (delayRef.current) {
+      delayRef.current.delayTime.setValueAtTime(params.delay, now);
+    }
+    
+    // Connect audio graph
+    oscillator.connect(gainNode);
+    gainNode.connect(masterGainRef.current);
+    
+    // Start oscillator
+    oscillator.start(now);
+    
+    // Store reference
+    activeOscillatorsRef.current.set(trackId, { oscillator, gainNode });
+    
+    return oscillator;
+  }, [audioContext]);
+
+  const stopSustainedTone = useCallback((trackId: string) => {
+    const activeTrack = activeOscillatorsRef.current.get(trackId);
+    if (activeTrack && audioContext) {
+      const { oscillator, gainNode } = activeTrack;
+      const now = audioContext.currentTime;
+      const releaseTime = 0.3; // 300ms release
+      
+      gainNode.gain.linearRampToValueAtTime(0, now + releaseTime);
+      oscillator.stop(now + releaseTime);
+      
+      activeOscillatorsRef.current.delete(trackId);
+    }
+  }, [audioContext]);
+
   const updateMasterVolume = useCallback((volume: number) => {
     if (masterGainRef.current) {
       masterGainRef.current.gain.setValueAtTime(volume, audioContext?.currentTime || 0);
@@ -127,6 +188,8 @@ export const useAudioEngine = () => {
     isInitialized,
     initializeAudio,
     playTone,
+    startSustainedTone,
+    stopSustainedTone,
     updateMasterVolume
   };
 };

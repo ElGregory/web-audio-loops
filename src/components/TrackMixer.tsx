@@ -6,7 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Copy, Trash2, Volume2, VolumeX, Play, Settings } from 'lucide-react';
+import { Plus, Copy, Trash2, Volume2, VolumeX, Play, Settings, Square, Pause } from 'lucide-react';
 import { TrackSequencer } from '@/components/TrackSequencer';
 import { AudioParams } from '@/hooks/useAudioEngine';
 import { toast } from 'sonner';
@@ -48,6 +48,7 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
       solo: false,
       volume: 0.8,
       steps: new Array(8).fill(false),
+      isPlaying: false,
     };
     onTracksChange([...tracks, newTrack]);
     toast(`Added ${newTrack.name}`);
@@ -108,6 +109,38 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
     }
   };
 
+  const toggleTrackPlay = (trackId: string) => {
+    const track = tracks.find(t => t.id === trackId);
+    if (track) {
+      updateTrack(trackId, { isPlaying: !track.isPlaying });
+      if (!track.isPlaying) {
+        onTrackPlay(track);
+      }
+    }
+  };
+
+  const playAllTracks = () => {
+    const tracksToPlay = tracks.filter(track => {
+      const hasSoloTracks = tracks.some(t => t.solo);
+      return hasSoloTracks ? track.solo && !track.muted : !track.muted;
+    });
+    
+    tracksToPlay.forEach(track => {
+      updateTrack(track.id, { isPlaying: true });
+      onTrackPlay(track);
+    });
+    toast(`Playing ${tracksToPlay.length} tracks concurrently`);
+  };
+
+  const stopAllTracks = () => {
+    tracks.forEach(track => {
+      if (track.isPlaying) {
+        updateTrack(track.id, { isPlaying: false });
+      }
+    });
+    toast("Stopped all tracks");
+  };
+
   const addPresetTrack = () => {
     if (!selectedPreset) return;
     const preset = allPresets.find(p => p.name === selectedPreset);
@@ -123,6 +156,22 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
         <Settings className="w-5 h-5 text-accent" />
         <h3 className="text-lg font-bold neon-text">Multi-Track Mixer</h3>
         <div className="ml-auto flex gap-2">
+          <Button 
+            onClick={playAllTracks}
+            size="sm"
+            className="bg-primary hover:bg-primary/80"
+          >
+            <Play className="w-4 h-4 mr-1" />
+            Play All
+          </Button>
+          <Button 
+            onClick={stopAllTracks}
+            variant="outline"
+            size="sm"
+          >
+            <Square className="w-4 h-4 mr-1" />
+            Stop All
+          </Button>
           <Select value={selectedPreset} onValueChange={setSelectedPreset}>
             <SelectTrigger className="w-48 bg-secondary">
               <SelectValue placeholder="Roland Presets" />
@@ -246,12 +295,12 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
                     {/* Action Buttons */}
                     <div className="flex gap-2">
                       <Button
-                        variant="outline"
+                        variant={track.isPlaying ? "default" : "outline"}
                         size="sm"
-                        onClick={() => onTrackPlay(track)}
+                        onClick={() => toggleTrackPlay(track.id)}
                         className="h-8 px-2"
                       >
-                        <Play className="w-4 h-4" />
+                        {track.isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                       </Button>
                       <Button
                         variant="outline"
