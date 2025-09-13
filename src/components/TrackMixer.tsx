@@ -97,6 +97,17 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
     updateTrack(trackId, { steps });
   };
 
+  const applyPresetToTrack = (trackId: string, presetName: string) => {
+    const preset = allPresets.find(p => p.name === presetName);
+    if (preset) {
+      updateTrack(trackId, { 
+        params: preset.params,
+        name: preset.name 
+      });
+      toast(`Applied ${preset.name} preset`);
+    }
+  };
+
   const addPresetTrack = () => {
     if (!selectedPreset) return;
     const preset = allPresets.find(p => p.name === selectedPreset);
@@ -181,59 +192,92 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs text-muted-foreground min-w-16">Volume</span>
-                      <Slider
-                        value={[track.volume * 100]}
-                        onValueChange={(value) => updateTrackVolume(track.id, value[0] / 100)}
-                        min={0}
-                        max={100}
-                        step={1}
-                        className="flex-1"
-                      />
-                      <span className="text-xs neon-text font-mono min-w-8">
-                        {Math.round(track.volume * 100)}
-                      </span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {track.params.waveform} • {track.params.frequency}Hz • Filter: {track.params.filterFreq}Hz
-                    </div>
+                <div className="space-y-4">
+                  {/* Preset Selector */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground min-w-16">Preset:</span>
+                    <Select onValueChange={(value) => applyPresetToTrack(track.id, value)}>
+                      <SelectTrigger className="flex-1 h-8 text-xs bg-background/50">
+                        <SelectValue placeholder="Change preset..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ROLAND_303_PRESETS.map((preset) => (
+                          <SelectItem key={preset.name} value={preset.name}>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-xs">303</Badge>
+                              {preset.name}
+                            </div>
+                          </SelectItem>
+                        ))}
+                        {ROLAND_909_PRESETS.map((preset) => (
+                          <SelectItem key={preset.name} value={preset.name}>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-xs">909</Badge>
+                              {preset.name}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onTrackPlay(track)}
-                      className="h-8 px-2"
-                    >
-                      <Play className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onTrackEdit(track)}
-                      className="h-8 px-2"
-                    >
-                      <Settings className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => cloneTrack(track)}
-                      className="h-8 px-2"
-                    >
-                      <Copy className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => deleteTrack(track.id)}
-                      className="h-8 px-2 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+
+                  {/* Volume Control */}
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs text-muted-foreground min-w-16">Volume</span>
+                        <Slider
+                          value={[track.volume * 100]}
+                          onValueChange={(value) => updateTrackVolume(track.id, value[0] / 100)}
+                          min={0}
+                          max={100}
+                          step={1}
+                          className="flex-1"
+                        />
+                        <span className="text-xs neon-text font-mono min-w-8">
+                          {Math.round(track.volume * 100)}
+                        </span>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {track.params.waveform} • {track.params.frequency}Hz • Filter: {track.params.filterFreq}Hz
+                      </div>
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onTrackPlay(track)}
+                        className="h-8 px-2"
+                      >
+                        <Play className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onTrackEdit(track)}
+                        className="h-8 px-2"
+                      >
+                        <Settings className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => cloneTrack(track)}
+                        className="h-8 px-2"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteTrack(track.id)}
+                        className="h-8 px-2 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
                 
