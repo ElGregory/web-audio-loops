@@ -29,6 +29,16 @@ export const useAudioEngine = () => {
     try {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       
+      // Ensure context is running (some browsers create it suspended)
+      try {
+        if (ctx.state === 'suspended') {
+          await ctx.resume();
+        }
+        console.log('[AudioEngine] Initialized AudioContext state:', ctx.state);
+      } catch (e) {
+        console.warn('[AudioEngine] Failed to resume AudioContext on init', e);
+      }
+      
       // Create audio nodes
       const analyser = ctx.createAnalyser();
       const masterGain = ctx.createGain();
@@ -38,6 +48,9 @@ export const useAudioEngine = () => {
       // Configure analyser
       analyser.fftSize = 2048;
       analyser.smoothingTimeConstant = 0.3;
+      
+      // Configure master
+      masterGain.gain.value = 1.0;
       
       // Configure filter
       filter.type = 'lowpass';
@@ -66,6 +79,13 @@ export const useAudioEngine = () => {
   const playTone = useCallback((params: AudioParams, duration: number = 0.5) => {
     if (!audioContext || !masterGainRef.current) return;
 
+    // Ensure context is running before playing (safety on some browsers)
+    if (audioContext.state === 'suspended') {
+      audioContext.resume().catch(() => {
+        console.warn('[AudioEngine] Resume failed inside playTone');
+      });
+    }
+
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
@@ -82,7 +102,9 @@ export const useAudioEngine = () => {
     gainNode.gain.setValueAtTime(0, now);
     gainNode.gain.linearRampToValueAtTime(params.volume, now + attackTime);
     gainNode.gain.linearRampToValueAtTime(params.sustain * params.volume, now + attackTime + decayTime);
-    gainNode.gain.setValueAtTime(params.sustain * params.volume, now + duration - releaseTime);
+    // Guard against negative time when duration < release
+    const sustainHoldTime = Math.max(now, now + duration - releaseTime);
+    gainNode.gain.setValueAtTime(params.sustain * params.volume, sustainHoldTime);
     gainNode.gain.linearRampToValueAtTime(0, now + duration);
     
     // Update filter parameters
@@ -100,10 +122,17 @@ export const useAudioEngine = () => {
     oscillator.connect(gainNode);
     gainNode.connect(masterGainRef.current);
     
+    // Cleanup after stop
+    oscillator.onended = () => {
+      try { oscillator.disconnect(); } catch {}
+      try { gainNode.disconnect(); } catch {}
+    };
+    
     // Start and stop
     oscillator.start(now);
     oscillator.stop(now + duration);
     
+    console.log('[AudioEngine] playTone', { freq: params.frequency, waveform: params.waveform, duration });
     return oscillator;
   }, [audioContext]);
 
