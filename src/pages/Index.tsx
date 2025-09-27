@@ -9,6 +9,46 @@ import { Button } from "@/components/ui/button";
 import { Zap, Settings, Save, Share } from "lucide-react";
 import { toast } from "sonner";
 
+// URL sharing utilities
+const encodeSequenceToUrl = (tracks: Track[], bpm: number) => {
+  const sequenceData = {
+    bpm,
+    tracks: tracks.map(track => ({
+      name: track.name,
+      params: track.params,
+      muted: track.muted,
+      solo: track.solo,
+      volume: track.volume,
+      steps: track.steps
+    }))
+  };
+  
+  const encoded = btoa(JSON.stringify(sequenceData));
+  const url = new URL(window.location.href);
+  url.searchParams.set('sequence', encoded);
+  return url.toString();
+};
+
+const decodeSequenceFromUrl = (): { tracks: Track[], bpm: number } | null => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const encoded = urlParams.get('sequence');
+  
+  if (!encoded) return null;
+  
+  try {
+    const decoded = JSON.parse(atob(encoded));
+    const tracks = decoded.tracks.map((track: any) => ({
+      ...track,
+      id: crypto.randomUUID() // Generate new IDs for shared tracks
+    }));
+    
+    return { tracks, bpm: decoded.bpm || 130 };
+  } catch (error) {
+    console.error('Failed to decode sequence from URL:', error);
+    return null;
+  }
+};
+
 const Index = () => {
   const { audioContext, analyser, isInitialized, initializeAudio, playTone, updateMasterVolume } = useAudioEngine();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -26,6 +66,16 @@ const Index = () => {
   useEffect(() => {
     tracksRef.current = tracks;
   }, [tracks]);
+
+  // Load sequence from URL on mount
+  useEffect(() => {
+    const sharedSequence = decodeSequenceFromUrl();
+    if (sharedSequence) {
+      setTracks(sharedSequence.tracks);
+      setBpm(sharedSequence.bpm);
+      toast("Loaded shared sequence!");
+    }
+  }, []);
   
 
   const handleInitAudio = async () => {
@@ -181,6 +231,29 @@ const Index = () => {
     toast("Loaded basic 909 kit!");
   };
 
+  const handleShare = async () => {
+    if (tracks.length === 0) {
+      toast("Create some tracks first before sharing!");
+      return;
+    }
+
+    const shareUrl = encodeSequenceToUrl(tracks, bpm);
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast("Share link copied to clipboard!");
+    } catch (error) {
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      toast("Share link copied to clipboard!");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -202,7 +275,7 @@ const Index = () => {
                   Initialize Audio
                 </Button>
               ) : (
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={handleShare}>
                     <Share className="w-4 h-4 mr-2" />
                     Share
                   </Button>
