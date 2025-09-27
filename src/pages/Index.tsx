@@ -167,11 +167,11 @@ const Index = () => {
     await initializeAudio();
     toast("Audio engine initialized! Ready to make some noise!");
     
-    // Auto-play if there's a shared sequence
-    if (hasSharedSequence() && tracks.length > 0) {
+    // Auto-play if there are tracks
+    if (tracks.length > 0) {
       setTimeout(() => {
         startTransport();
-        toast("Auto-playing shared sequence!");
+        toast("Auto-playing sequence!");
       }, 500);
     }
   };
