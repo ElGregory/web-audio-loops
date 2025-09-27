@@ -392,28 +392,6 @@ const Index = () => {
     toast("Loaded acid techno sequence!");
   };
 
-  const handleShare = async () => {
-    if (tracks.length === 0) {
-      toast("Create some tracks first before sharing!");
-      return;
-    }
-
-    const shareUrl = encodeSequenceToUrl(tracks, bpm);
-    
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      toast("Share link copied to clipboard!");
-    } catch (error) {
-      // Fallback for browsers that don't support clipboard API
-      const textArea = document.createElement('textarea');
-      textArea.value = shareUrl;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      toast("Share link copied to clipboard!");
-    }
-  };
 
   const handleShareEmbed = async () => {
     if (tracks.length === 0) {
@@ -453,16 +431,10 @@ const Index = () => {
                   Initialize Audio
                 </Button>
               ) : (
-                <>
-                  <Button variant="outline" size="sm" onClick={handleShare}>
-                    <Share className="w-4 h-4 mr-2" />
-                    Share
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleShareEmbed}>
-                    <Share className="w-4 h-4 mr-2" />
-                    Copy Embed
-                  </Button>
-                </>
+                <Button variant="outline" size="sm" onClick={handleShareEmbed}>
+                  <Share className="w-4 h-4 mr-2" />
+                  Share
+                </Button>
               )}
             </div>
           </div>
