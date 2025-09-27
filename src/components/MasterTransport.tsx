@@ -1,8 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, Pause, Square } from "lucide-react";
+import { Play, Pause, Square, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface MasterTransportProps {
   bpm: number;
@@ -11,7 +17,8 @@ interface MasterTransportProps {
   stepsCount: number;
   onTogglePlay: () => void;
   onBpmChange: (bpm: number) => void;
-  onLoadKit: () => void;
+  onLoad909Kit: () => void;
+  onLoadAcidTechno: () => void;
   children?: React.ReactNode;
   className?: string;
 }
@@ -23,7 +30,8 @@ export const MasterTransport = ({
   stepsCount,
   onTogglePlay,
   onBpmChange,
-  onLoadKit,
+  onLoad909Kit,
+  onLoadAcidTechno,
   children,
   className
 }: MasterTransportProps) => {
@@ -50,14 +58,22 @@ export const MasterTransport = ({
           <div className="text-sm text-muted-foreground">
             Step {currentStep + 1}/{stepsCount}
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onLoadKit}
-            className="h-8"
-          >
-            Load 909 Kit
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8">
+                Load Preset
+                <ChevronDown className="w-3 h-3 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={onLoad909Kit}>
+                909 Drum Kit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onLoadAcidTechno}>
+                Acid Techno
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             onClick={onTogglePlay}
             variant={isPlaying ? "destructive" : "default"}

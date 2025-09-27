@@ -4,7 +4,7 @@ import { Waveform } from "@/components/Waveform";
 import { TrackMixer } from "@/components/TrackMixer";
 import { TrackEditor } from "@/components/TrackEditor";
 import { MasterTransport } from "@/components/MasterTransport";
-import { Track, ROLAND_909_PRESETS } from "@/types/Track";
+import { Track, ROLAND_909_PRESETS, ROLAND_303_PRESETS } from "@/types/Track";
 import { Button } from "@/components/ui/button";
 import { Zap, Settings, Save, Share } from "lucide-react";
 import { toast } from "sonner";
@@ -274,7 +274,7 @@ const Index = () => {
     
     const kickPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Kick");
     const snarePreset = ROLAND_909_PRESETS.find(p => p.name === "909 Snare");
-    const hihatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Closed Hat");
+    const hihatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Hi-Hat");
     
     console.log("[909Kit] Found presets:", { kickPreset: !!kickPreset, snarePreset: !!snarePreset, hihatPreset: !!hihatPreset });
     
@@ -324,7 +324,72 @@ const Index = () => {
     
     console.log("[909Kit] Total tracks created:", newTracks.length);
     setTracks(newTracks);
-    toast("Loaded basic 909 kit!");
+    toast("Loaded 909 drum kit!");
+  };
+
+  const loadAcidTechno = () => {
+    const acidBassPreset = ROLAND_303_PRESETS.find(p => p.name === "303 Acid Bass");
+    const leadPreset = ROLAND_303_PRESETS.find(p => p.name === "303 Lead");
+    const kickPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Kick");
+    const openHatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Open Hat");
+    
+    const newTracks: Track[] = [];
+    
+    if (kickPreset) {
+      const kickTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Kick",
+        params: kickPreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.9,
+        steps: [true, false, false, false, false, false, true, false, true, false, false, false, false, false, true, false]
+      };
+      newTracks.push(kickTrack);
+    }
+    
+    if (acidBassPreset) {
+      const bassTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Acid Bass",
+        params: acidBassPreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.7,
+        steps: [true, false, true, true, false, true, false, true, true, false, true, true, false, true, false, true]
+      };
+      newTracks.push(bassTrack);
+    }
+    
+    if (leadPreset) {
+      const leadTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Lead",
+        params: leadPreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.6,
+        steps: [false, false, false, false, false, false, false, false, true, false, false, true, false, false, true, false]
+      };
+      newTracks.push(leadTrack);
+    }
+    
+    if (openHatPreset) {
+      const hatTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Open Hat",
+        params: openHatPreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.4,
+        steps: [false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, true]
+      };
+      newTracks.push(hatTrack);
+    }
+    
+    setTracks(newTracks);
+    setBpm(130);
+    toast("Loaded acid techno sequence!");
   };
 
   const handleShare = async () => {
@@ -441,7 +506,8 @@ const Index = () => {
               stepsCount={stepsCount}
               onTogglePlay={toggleTransport}
               onBpmChange={setBpm}
-              onLoadKit={loadBasic909Kit}
+              onLoad909Kit={loadBasic909Kit}
+              onLoadAcidTechno={loadAcidTechno}
             >
               <Waveform
                 audioContext={audioContext}
