@@ -320,37 +320,22 @@ const Index = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Master Transport and Live Visualization */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <MasterTransport
-                bpm={bpm}
+            {/* Master Transport with Live Visualization */}
+            <MasterTransport
+              bpm={bpm}
+              isPlaying={isTransportPlaying}
+              currentStep={currentStep}
+              stepsCount={stepsCount}
+              onTogglePlay={toggleTransport}
+              onBpmChange={setBpm}
+              onLoadKit={loadBasic909Kit}
+            >
+              <Waveform
+                audioContext={audioContext}
+                analyserNode={analyser}
                 isPlaying={isTransportPlaying}
-                currentStep={currentStep}
-                stepsCount={stepsCount}
-                onTogglePlay={toggleTransport}
-                onBpmChange={setBpm}
               />
-              
-              <div className="control-section">
-                <div className="panel-header">
-                  <Settings className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-bold neon-text">Live Visualization</h3>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={loadBasic909Kit}
-                    className="ml-auto"
-                  >
-                    Load 909 Kit
-                  </Button>
-                </div>
-                <Waveform
-                  audioContext={audioContext}
-                  analyserNode={analyser}
-                  isPlaying={isTransportPlaying}
-                />
-              </div>
-            </div>
+            </MasterTransport>
 
             {/* Multi-Track Mixer */}
             <TrackMixer

@@ -11,6 +11,8 @@ interface MasterTransportProps {
   stepsCount: number;
   onTogglePlay: () => void;
   onBpmChange: (bpm: number) => void;
+  onLoadKit: () => void;
+  children?: React.ReactNode;
   className?: string;
 }
 
@@ -21,6 +23,8 @@ export const MasterTransport = ({
   stepsCount,
   onTogglePlay,
   onBpmChange,
+  onLoadKit,
+  children,
   className
 }: MasterTransportProps) => {
   return (
@@ -46,6 +50,14 @@ export const MasterTransport = ({
           <div className="text-sm text-muted-foreground">
             Step {currentStep + 1}/{stepsCount}
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onLoadKit}
+            className="h-8"
+          >
+            Load 909 Kit
+          </Button>
           <Button
             onClick={onTogglePlay}
             variant={isPlaying ? "destructive" : "default"}
@@ -80,6 +92,13 @@ export const MasterTransport = ({
           />
         ))}
       </div>
+
+      {/* Live Visualization */}
+      {children && (
+        <div className="mt-4">
+          {children}
+        </div>
+      )}
     </div>
   );
 };
