@@ -67,6 +67,12 @@ const Index = () => {
     tracksRef.current = tracks;
   }, [tracks]);
 
+  // Check if there's a shared sequence
+  const hasSharedSequence = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.has('sequence');
+  };
+
   // Load sequence from URL on mount
   useEffect(() => {
     const sharedSequence = decodeSequenceFromUrl();
@@ -291,10 +297,21 @@ const Index = () => {
           <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
             <div className="panel max-w-md p-8">
               <Zap className="w-16 h-16 text-accent mx-auto mb-4" />
-              <h2 className="text-xl font-bold neon-text mb-2">Welcome to SteamSynth</h2>
-              <p className="text-muted-foreground mb-6">
-                A steampunk-inspired Web Audio API sound generator. Create, sequence, and explore unique sounds with vintage-style controls.
-              </p>
+              {hasSharedSequence() ? (
+                <>
+                  <h2 className="text-xl font-bold neon-text mb-2">Shared Sequence Loaded</h2>
+                  <p className="text-muted-foreground mb-6">
+                    A sequence has been shared with you! Initialize the audio engine and press play to hear it.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-xl font-bold neon-text mb-2">Welcome to SteamSynth</h2>
+                  <p className="text-muted-foreground mb-6">
+                    A steampunk-inspired Web Audio API sound generator. Create, sequence, and explore unique sounds with vintage-style controls.
+                  </p>
+                </>
+              )}
               <Button onClick={handleInitAudio} size="lg" className="bg-accent hover:bg-accent/80">
                 <Zap className="w-5 h-5 mr-2" />
                 Start Your Audio Engine
