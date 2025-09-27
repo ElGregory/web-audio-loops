@@ -10,6 +10,70 @@ import { Zap, Settings, Save, Share } from "lucide-react";
 import { toast } from "sonner";
 
 // URL sharing utilities
+
+// Human-readable format: bpm:130|kick:1010101010101010:60:0.8:false:false|snare:0001000100010001:200:0.7:false:false
+const encodeSequenceToReadable = (tracks: Track[], bpm: number) => {
+  const trackStrings = tracks.map(track => {
+    const steps = track.steps.map(s => s ? '1' : '0').join('');
+    const frequency = Math.round(track.params.frequency);
+    const volume = Math.round(track.volume * 100) / 100;
+    const muted = track.muted ? 'true' : 'false';
+    const solo = track.solo ? 'true' : 'false';
+    
+    return `${track.name}:${steps}:${frequency}:${volume}:${muted}:${solo}`;
+  });
+  
+  return `bpm:${bpm}|${trackStrings.join('|')}`;
+};
+
+const decodeSequenceFromReadable = (readable: string): { tracks: Track[], bpm: number } | null => {
+  try {
+    const parts = readable.split('|');
+    const bpmPart = parts[0];
+    
+    if (!bpmPart.startsWith('bpm:')) return null;
+    
+    const bpm = parseInt(bpmPart.split(':')[1]);
+    const tracks: Track[] = [];
+    
+    for (let i = 1; i < parts.length; i++) {
+      const trackParts = parts[i].split(':');
+      if (trackParts.length !== 6) continue;
+      
+      const [name, stepsStr, freqStr, volStr, mutedStr, soloStr] = trackParts;
+      const steps = stepsStr.split('').map(s => s === '1');
+      
+      tracks.push({
+        id: crypto.randomUUID(),
+        name,
+        params: {
+          frequency: parseInt(freqStr),
+          filterFreq: 1000,
+          filterQ: 1,
+          attack: 0.01,
+          decay: 0.1,
+          sustain: 0.3,
+          release: 0.5,
+          waveform: 'sine' as const,
+          volume: 0.8,
+          delay: 0,
+          reverb: 0
+        },
+        muted: mutedStr === 'true',
+        solo: soloStr === 'true',
+        volume: parseFloat(volStr),
+        steps
+      });
+    }
+    
+    return { tracks, bpm };
+  } catch (error) {
+    console.error('Failed to decode readable sequence:', error);
+    return null;
+  }
+};
+
+// Legacy base64 format for complex sequences
 const encodeSequenceToUrl = (tracks: Track[], bpm: number) => {
   const sequenceData = {
     bpm,
@@ -29,10 +93,25 @@ const encodeSequenceToUrl = (tracks: Track[], bpm: number) => {
   return url.toString();
 };
 
+const encodeSequenceToEmbedUrl = (tracks: Track[], bpm: number) => {
+  const readable = encodeSequenceToReadable(tracks, bpm);
+  const url = new URL(window.location.href);
+  url.searchParams.set('loop', readable);
+  return url.toString();
+};
+
 const decodeSequenceFromUrl = (): { tracks: Track[], bpm: number } | null => {
   const urlParams = new URLSearchParams(window.location.search);
-  const encoded = urlParams.get('sequence');
   
+  // Try human-readable format first
+  const loop = urlParams.get('loop');
+  if (loop) {
+    const result = decodeSequenceFromReadable(loop);
+    if (result) return result;
+  }
+  
+  // Fall back to base64 format
+  const encoded = urlParams.get('sequence');
   if (!encoded) return null;
   
   try {
@@ -271,6 +350,23 @@ const Index = () => {
     }
   };
 
+  const handleShareEmbed = async () => {
+    if (tracks.length === 0) {
+      toast("Create some tracks first before sharing!");
+      return;
+    }
+
+    const embedUrl = encodeSequenceToEmbedUrl(tracks, bpm);
+    
+    try {
+      await navigator.clipboard.writeText(embedUrl);
+      toast("Embed URL copied to clipboard!");
+    } catch (error) {
+      toast("Failed to copy to clipboard");
+      console.error("Clipboard error:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -292,10 +388,16 @@ const Index = () => {
                   Initialize Audio
                 </Button>
               ) : (
-                <Button variant="outline" size="sm" onClick={handleShare}>
+                <>
+                  <Button variant="outline" size="sm" onClick={handleShare}>
                     <Share className="w-4 h-4 mr-2" />
                     Share
                   </Button>
+                  <Button variant="outline" size="sm" onClick={handleShareEmbed}>
+                    <Share className="w-4 h-4 mr-2" />
+                    Copy Embed
+                  </Button>
+                </>
               )}
             </div>
           </div>
