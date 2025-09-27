@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { useAudioEngine, AudioParams } from "@/hooks/useAudioEngine";
-import { SynthControls } from "@/components/SynthControls";
+import { useAudioEngine } from "@/hooks/useAudioEngine";
 import { Waveform } from "@/components/Waveform";
 import { TrackMixer } from "@/components/TrackMixer";
 import { TrackEditor } from "@/components/TrackEditor";
@@ -28,36 +27,12 @@ const Index = () => {
     tracksRef.current = tracks;
   }, [tracks]);
   
-  const [synthParams, setSynthParams] = useState<AudioParams>({
-    frequency: 440,
-    waveform: 'sine' as OscillatorType,
-    volume: 0.3,
-    attack: 10,
-    decay: 200,
-    sustain: 0.7,
-    release: 300,
-    filterFreq: 2000,
-    filterQ: 1,
-    delay: 0.1,
-    reverb: 0.2,
-  });
 
   const handleInitAudio = async () => {
     await initializeAudio();
     toast("Audio engine initialized! Ready to make some noise!");
   };
 
-  const handlePlayNote = () => {
-    if (!isInitialized) {
-      toast("Initialize audio first!");
-      return;
-    }
-    
-    setIsPlaying(true);
-    playTone(synthParams, 0.5);
-    setTimeout(() => setIsPlaying(false), 500);
-    toast(`Playing ${synthParams.waveform} wave at ${synthParams.frequency}Hz`);
-  };
 
   const playActiveTracksForStep = useCallback((step: number) => {
     if (!isInitialized) return;
@@ -147,11 +122,6 @@ const Index = () => {
     setEditingTrack(updatedTrack);
   };
 
-  const handleSavePreset = () => {
-    const preset = JSON.stringify(synthParams, null, 2);
-    navigator.clipboard.writeText(preset);
-    toast("Preset copied to clipboard!");
-  };
 
   const loadBasic909Kit = () => {
     console.log("[909Kit] Available presets:", ROLAND_909_PRESETS.map(p => p.name));
@@ -232,16 +202,10 @@ const Index = () => {
                   Initialize Audio
                 </Button>
               ) : (
-                <>
-                  <Button variant="outline" onClick={handleSavePreset} size="sm">
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Preset
-                  </Button>
-                  <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm">
                     <Share className="w-4 h-4 mr-2" />
                     Share
                   </Button>
-                </>
               )}
             </div>
           </div>
@@ -276,6 +240,27 @@ const Index = () => {
               onBpmChange={setBpm}
             />
 
+            {/* Live Visualization */}
+            <div className="control-section">
+              <div className="panel-header">
+                <Settings className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-bold neon-text">Live Visualization</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={loadBasic909Kit}
+                  className="ml-auto"
+                >
+                  Load 909 Kit
+                </Button>
+              </div>
+              <Waveform
+                audioContext={audioContext}
+                analyserNode={analyser}
+                isPlaying={isPlaying}
+              />
+            </div>
+
             {/* Multi-Track Mixer */}
             <TrackMixer
               tracks={tracks}
@@ -285,82 +270,6 @@ const Index = () => {
               isPlaying={isTransportPlaying}
               currentStep={currentStep}
             />
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Left Column */}
-              <div className="space-y-6">
-                <SynthControls
-                  params={synthParams}
-                  onParamsChange={setSynthParams}
-                  onPlayNote={handlePlayNote}
-                />
-                
-                <div className="control-section">
-                  <div className="panel-header">
-                    <h3 className="text-lg font-bold neon-text">Quick Actions</h3>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={loadBasic909Kit}
-                      className="ml-auto"
-                    >
-                      Load 909 Kit
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column */}
-              <div className="space-y-6">
-                <div className="control-section">
-                  <div className="panel-header">
-                    <Settings className="w-5 h-5 text-primary" />
-                    <h3 className="text-lg font-bold neon-text">Live Visualization</h3>
-                  </div>
-                  <Waveform
-                    audioContext={audioContext}
-                    analyserNode={analyser}
-                    isPlaying={isPlaying}
-                  />
-                </div>
-
-                <div className="control-section">
-                  <div className="panel-header">
-                    <h3 className="text-lg font-bold neon-text">Quick Presets</h3>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setSynthParams({...synthParams, waveform: 'square', frequency: 220, attack: 1, decay: 50, sustain: 0.9, release: 100})}
-                      className="bg-secondary hover:bg-secondary/80"
-                    >
-                      Beep
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={() => setSynthParams({...synthParams, waveform: 'sawtooth', frequency: 100, attack: 5, decay: 400, sustain: 0.3, release: 600})}
-                      className="bg-secondary hover:bg-secondary/80"
-                    >
-                      Boop
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={() => setSynthParams({...synthParams, waveform: 'triangle', frequency: 80, attack: 1, decay: 200, sustain: 0.1, release: 300})}
-                      className="bg-secondary hover:bg-secondary/80"
-                    >
-                      Kick
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={() => setSynthParams({...synthParams, waveform: 'square', frequency: 1200, attack: 1, decay: 50, sustain: 0.1, release: 100, filterFreq: 4000})}
-                      className="bg-secondary hover:bg-secondary/80"
-                    >
-                      Hi-Hat
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
