@@ -149,7 +149,7 @@ const Index = () => {
   // Check if there's a shared sequence
   const hasSharedSequence = () => {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.has('sequence');
+    return urlParams.has('loop');
   };
 
   // Load sequence from URL on mount
@@ -166,6 +166,14 @@ const Index = () => {
   const handleInitAudio = async () => {
     await initializeAudio();
     toast("Audio engine initialized! Ready to make some noise!");
+    
+    // Auto-play if there's a shared sequence
+    if (hasSharedSequence() && tracks.length > 0) {
+      setTimeout(() => {
+        startTransport();
+        toast("Auto-playing shared sequence!");
+      }, 500);
+    }
   };
 
 
