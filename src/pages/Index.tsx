@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useAudioEngine, AudioParams } from "@/hooks/useAudioEngine";
 import { SynthControls } from "@/components/SynthControls";
 import { Waveform } from "@/components/Waveform";
@@ -20,7 +20,13 @@ const Index = () => {
   const [editingTrack, setEditingTrack] = useState<Track | null>(null);
   const [isTrackEditorOpen, setIsTrackEditorOpen] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const tracksRef = useRef<Track[]>(tracks);
   const stepsCount = 16;
+
+  // Keep tracks ref updated
+  useEffect(() => {
+    tracksRef.current = tracks;
+  }, [tracks]);
   
   const [synthParams, setSynthParams] = useState<AudioParams>({
     frequency: 440,
@@ -56,10 +62,11 @@ const Index = () => {
   const playActiveTracksForStep = useCallback((step: number) => {
     if (!isInitialized) return;
     
-    console.log(`[Transport] Step ${step}, Total tracks: ${tracks.length}`);
+    const currentTracks = tracksRef.current;
+    console.log(`[Transport] Step ${step}, Total tracks: ${currentTracks.length}`);
     
-    const hasSoloTracks = tracks.some(t => t.solo);
-    const playableTracks = tracks.filter(track => {
+    const hasSoloTracks = currentTracks.some(t => t.solo);
+    const playableTracks = currentTracks.filter(track => {
       const shouldPlay = hasSoloTracks ? track.solo && !track.muted : !track.muted;
       const hasActiveStep = track.steps[step];
       console.log(`[Transport] Track "${track.name}": shouldPlay=${shouldPlay}, hasActiveStep=${hasActiveStep}, step[${step}]=${track.steps[step]}`);
@@ -73,7 +80,7 @@ const Index = () => {
       console.log(`[Transport] Playing track "${track.name}": ${track.params.frequency}Hz ${track.params.waveform}`);
       playTone(adjustedParams, 0.2);
     });
-  }, [tracks, isInitialized, playTone]);
+  }, [isInitialized, playTone]);
 
   const startTransport = useCallback(() => {
     if (!isInitialized) {
