@@ -12,6 +12,9 @@ export interface AudioParams {
   filterQ: number;
   delay: number;
   reverb: number;
+  isDrum?: boolean;
+  noiseLevel?: number;
+  pitchDecay?: number;
 }
 
 export const useAudioEngine = () => {
@@ -78,6 +81,20 @@ export const useAudioEngine = () => {
     }
   }, [audioContext]);
 
+  const createNoiseBuffer = useCallback((duration: number) => {
+    if (!audioContext) return null;
+    
+    const bufferSize = audioContext.sampleRate * duration;
+    const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+    
+    return noiseBuffer;
+  }, [audioContext]);
+
   const playTone = useCallback((params: AudioParams, duration: number = 0.5) => {
     if (!audioContext || !masterGainRef.current) return;
 
@@ -88,55 +105,128 @@ export const useAudioEngine = () => {
       });
     }
 
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    // Configure oscillator
-    oscillator.type = params.waveform;
-    oscillator.frequency.setValueAtTime(params.frequency, audioContext.currentTime);
-    
-    // Configure envelope
     const now = audioContext.currentTime;
     const attackTime = params.attack / 1000;
     const decayTime = params.decay / 1000;
     const releaseTime = params.release / 1000;
-    
-    gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(params.volume, now + attackTime);
-    gainNode.gain.linearRampToValueAtTime(params.sustain * params.volume, now + attackTime + decayTime);
-    // Guard against negative time when duration < release
-    const sustainHoldTime = Math.max(now, now + duration - releaseTime);
-    gainNode.gain.setValueAtTime(params.sustain * params.volume, sustainHoldTime);
-    gainNode.gain.linearRampToValueAtTime(0, now + duration);
-    
-    // Update filter parameters
-    if (filterRef.current) {
-      filterRef.current.frequency.setValueAtTime(params.filterFreq, now);
-      filterRef.current.Q.setValueAtTime(params.filterQ, now);
+
+    if (params.isDrum) {
+      // Drum synthesis with noise + oscillator
+      const noiseBuffer = createNoiseBuffer(duration);
+      if (!noiseBuffer) return;
+
+      const noiseSource = audioContext.createBufferSource();
+      const oscillator = audioContext.createOscillator();
+      const noiseGain = audioContext.createGain();
+      const oscGain = audioContext.createGain();
+      const mixerGain = audioContext.createGain();
+      const drumFilter = audioContext.createBiquadFilter();
+
+      // Configure noise
+      noiseSource.buffer = noiseBuffer;
+      noiseSource.connect(noiseGain);
+      
+      // Configure oscillator with pitch envelope for kicks
+      oscillator.type = params.waveform;
+      oscillator.frequency.setValueAtTime(params.frequency, now);
+      if (params.pitchDecay) {
+        oscillator.frequency.exponentialRampToValueAtTime(
+          params.frequency * 0.3, 
+          now + (params.pitchDecay / 1000)
+        );
+      }
+      oscillator.connect(oscGain);
+
+      // Configure filter for drum character
+      drumFilter.type = 'bandpass';
+      drumFilter.frequency.setValueAtTime(params.filterFreq, now);
+      drumFilter.Q.setValueAtTime(params.filterQ, now);
+
+      // Set gain levels
+      const noiseLevel = params.noiseLevel || 0;
+      const oscLevel = 1 - noiseLevel;
+      
+      noiseGain.gain.setValueAtTime(0, now);
+      noiseGain.gain.linearRampToValueAtTime(noiseLevel * params.volume, now + attackTime);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + duration * 0.8);
+
+      oscGain.gain.setValueAtTime(0, now);
+      oscGain.gain.linearRampToValueAtTime(oscLevel * params.volume, now + attackTime);
+      oscGain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+
+      // Connect audio graph
+      noiseGain.connect(mixerGain);
+      oscGain.connect(mixerGain);
+      mixerGain.connect(drumFilter);
+      drumFilter.connect(masterGainRef.current);
+
+      // Start sources
+      noiseSource.start(now);
+      noiseSource.stop(now + duration);
+      oscillator.start(now);
+      oscillator.stop(now + duration);
+
+      // Cleanup
+      const cleanup = () => {
+        try { noiseSource.disconnect(); } catch {}
+        try { oscillator.disconnect(); } catch {}
+        try { noiseGain.disconnect(); } catch {}
+        try { oscGain.disconnect(); } catch {}
+        try { mixerGain.disconnect(); } catch {}
+        try { drumFilter.disconnect(); } catch {}
+      };
+      
+      noiseSource.onended = cleanup;
+      
+      console.log('[AudioEngine] playDrum', { freq: params.frequency, noiseLevel, duration });
+      return noiseSource;
+    } else {
+      // Regular oscillator synthesis
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      // Configure oscillator
+      oscillator.type = params.waveform;
+      oscillator.frequency.setValueAtTime(params.frequency, audioContext.currentTime);
+      
+      // Configure envelope
+      gainNode.gain.setValueAtTime(0, now);
+      gainNode.gain.linearRampToValueAtTime(params.volume, now + attackTime);
+      gainNode.gain.linearRampToValueAtTime(params.sustain * params.volume, now + attackTime + decayTime);
+      // Guard against negative time when duration < release
+      const sustainHoldTime = Math.max(now, now + duration - releaseTime);
+      gainNode.gain.setValueAtTime(params.sustain * params.volume, sustainHoldTime);
+      gainNode.gain.linearRampToValueAtTime(0, now + duration);
+      
+      // Update filter parameters
+      if (filterRef.current) {
+        filterRef.current.frequency.setValueAtTime(params.filterFreq, now);
+        filterRef.current.Q.setValueAtTime(params.filterQ, now);
+      }
+      
+      // Update delay
+      if (delayRef.current) {
+        delayRef.current.delayTime.setValueAtTime(params.delay, now);
+      }
+      
+      // Connect audio graph
+      oscillator.connect(gainNode);
+      gainNode.connect(masterGainRef.current);
+      
+      // Cleanup after stop
+      oscillator.onended = () => {
+        try { oscillator.disconnect(); } catch {}
+        try { gainNode.disconnect(); } catch {}
+      };
+      
+      // Start and stop
+      oscillator.start(now);
+      oscillator.stop(now + duration);
+      
+      console.log('[AudioEngine] playTone', { freq: params.frequency, waveform: params.waveform, duration });
+      return oscillator;
     }
-    
-    // Update delay
-    if (delayRef.current) {
-      delayRef.current.delayTime.setValueAtTime(params.delay, now);
-    }
-    
-    // Connect audio graph
-    oscillator.connect(gainNode);
-    gainNode.connect(masterGainRef.current);
-    
-    // Cleanup after stop
-    oscillator.onended = () => {
-      try { oscillator.disconnect(); } catch {}
-      try { gainNode.disconnect(); } catch {}
-    };
-    
-    // Start and stop
-    oscillator.start(now);
-    oscillator.stop(now + duration);
-    
-    console.log('[AudioEngine] playTone', { freq: params.frequency, waveform: params.waveform, duration });
-    return oscillator;
-  }, [audioContext]);
+  }, [audioContext, createNoiseBuffer]);
 
   const updateMasterVolume = useCallback((volume: number) => {
     if (masterGainRef.current) {
