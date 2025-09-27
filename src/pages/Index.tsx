@@ -119,6 +119,17 @@ const Index = () => {
       return;
     }
 
+    // Ensure audio context is running before starting transport
+    if (audioContext?.state === 'suspended') {
+      audioContext.resume().then(() => {
+        console.log('[Transport] Audio context resumed');
+      }).catch((e) => {
+        console.error('[Transport] Failed to resume audio context:', e);
+        toast("Audio context error - try reinitializing audio");
+        return;
+      });
+    }
+
     const stepMs = (60 / bpm / 4) * 1000; // 16th notes
     setIsTransportPlaying(true);
     setCurrentStep(0);

@@ -95,8 +95,8 @@ export const Waveform = ({ audioContext, analyserNode, isPlaying, className }: W
       <canvas 
         ref={canvasRef}
         width={400}
-        height={200}
-        className={`w-full h-48 ${className}`}
+        height={120}
+        className={`w-full h-24 ${className}`}
       />
     </div>
   );
