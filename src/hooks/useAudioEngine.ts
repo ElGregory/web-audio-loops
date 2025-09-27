@@ -142,16 +142,17 @@ export const useAudioEngine = () => {
       drumFilter.frequency.setValueAtTime(params.filterFreq, now);
       drumFilter.Q.setValueAtTime(params.filterQ, now);
 
-      // Set gain levels
+      // Set gain levels with drum boost
+      const drumBoost = 2.5; // Boost drums to compete with other sounds
       const noiseLevel = params.noiseLevel || 0;
       const oscLevel = 1 - noiseLevel;
       
       noiseGain.gain.setValueAtTime(0, now);
-      noiseGain.gain.linearRampToValueAtTime(noiseLevel * params.volume, now + attackTime);
+      noiseGain.gain.linearRampToValueAtTime(noiseLevel * params.volume * drumBoost, now + attackTime);
       noiseGain.gain.exponentialRampToValueAtTime(0.01, now + duration * 0.8);
 
       oscGain.gain.setValueAtTime(0, now);
-      oscGain.gain.linearRampToValueAtTime(oscLevel * params.volume, now + attackTime);
+      oscGain.gain.linearRampToValueAtTime(oscLevel * params.volume * drumBoost, now + attackTime);
       oscGain.gain.exponentialRampToValueAtTime(0.01, now + duration);
 
       // Connect audio graph

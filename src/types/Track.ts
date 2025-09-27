@@ -77,7 +77,7 @@ export const ROLAND_909_PRESETS: TrackPreset[] = [
     params: {
       frequency: 80,
       waveform: 'sine',
-      volume: 1.0,
+      volume: 1.2,
       attack: 1,
       decay: 200,
       sustain: 0.1,
@@ -97,7 +97,7 @@ export const ROLAND_909_PRESETS: TrackPreset[] = [
     params: {
       frequency: 220,
       waveform: 'triangle',
-      volume: 0.8,
+      volume: 1.0,
       attack: 1,
       decay: 100,
       sustain: 0.3,
@@ -117,7 +117,7 @@ export const ROLAND_909_PRESETS: TrackPreset[] = [
     params: {
       frequency: 8000,
       waveform: 'square',
-      volume: 0.6,
+      volume: 0.8,
       attack: 1,
       decay: 50,
       sustain: 0.1,
@@ -137,7 +137,7 @@ export const ROLAND_909_PRESETS: TrackPreset[] = [
     params: {
       frequency: 6000,
       waveform: 'square',
-      volume: 0.5,
+      volume: 0.7,
       attack: 1,
       decay: 250,
       sustain: 0.2,
