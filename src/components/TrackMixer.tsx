@@ -18,11 +18,10 @@ interface TrackMixerProps {
   onTrackEdit: (track: Track) => void;
   isPlaying: boolean;
   currentStep: number;
-  onSequencerPlay: (trackId: string) => void;
   className?: string;
 }
 
-export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, isPlaying, currentStep, onSequencerPlay, className }: TrackMixerProps) => {
+export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, isPlaying, currentStep, className }: TrackMixerProps) => {
   const [selectedPreset, setSelectedPreset] = useState<string>('');
 
   const allPresets: TrackPreset[] = [...ROLAND_303_PRESETS, ...ROLAND_909_PRESETS];
@@ -47,7 +46,7 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
       muted: false,
       solo: false,
       volume: 0.8,
-      steps: new Array(8).fill(false),
+      steps: new Array(16).fill(false),
     };
     onTracksChange([...tracks, newTrack]);
     toast(`Added ${newTrack.name}`);
@@ -287,7 +286,6 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
                     isPlaying={isPlaying}
                     currentStep={currentStep}
                     onStepsChange={(steps) => updateTrackSteps(track.id, steps)}
-                    onPlay={() => onSequencerPlay(track.id)}
                   />
                 </div>
               </CardContent>

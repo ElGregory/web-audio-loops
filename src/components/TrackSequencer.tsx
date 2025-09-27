@@ -7,7 +7,6 @@ interface TrackSequencerProps {
   isPlaying: boolean;
   currentStep: number;
   onStepsChange: (steps: boolean[]) => void;
-  onPlay: () => void;
   className?: string;
 }
 
@@ -15,8 +14,7 @@ export const TrackSequencer = ({
   steps, 
   isPlaying, 
   currentStep, 
-  onStepsChange, 
-  onPlay,
+  onStepsChange,
   className 
 }: TrackSequencerProps) => {
   const toggleStep = (index: number) => {
@@ -35,14 +33,6 @@ export const TrackSequencer = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={onPlay}
-          className="h-7 px-2"
-        >
-          {isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
           onClick={handleClear}
           className="h-7 px-2 text-xs"
         >
@@ -53,7 +43,7 @@ export const TrackSequencer = ({
         </span>
       </div>
       
-      <div className="grid grid-cols-8 gap-1">
+      <div className="grid grid-cols-16 gap-1">
         {steps.map((isActive, i) => (
           <button
             key={i}

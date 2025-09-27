@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useAudioEngine, AudioParams } from "@/hooks/useAudioEngine";
 import { SynthControls } from "@/components/SynthControls";
 import { Waveform } from "@/components/Waveform";
-import { Sequencer } from "@/components/Sequencer";
 import { TrackMixer } from "@/components/TrackMixer";
 import { TrackEditor } from "@/components/TrackEditor";
-import { Track } from "@/types/Track";
+import { MasterTransport } from "@/components/MasterTransport";
+import { Track, ROLAND_909_PRESETS } from "@/types/Track";
 import { Button } from "@/components/ui/button";
 import { Zap, Settings, Save, Share } from "lucide-react";
 import { toast } from "sonner";
@@ -14,10 +14,13 @@ const Index = () => {
   const { audioContext, analyser, isInitialized, initializeAudio, playTone, updateMasterVolume } = useAudioEngine();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(-1);
-  const [globalSequencerPlaying, setGlobalSequencerPlaying] = useState(false);
+  const [bpm, setBpm] = useState(130);
+  const [isTransportPlaying, setIsTransportPlaying] = useState(false);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [editingTrack, setEditingTrack] = useState<Track | null>(null);
   const [isTrackEditorOpen, setIsTrackEditorOpen] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const stepsCount = 16;
   
   const [synthParams, setSynthParams] = useState<AudioParams>({
     frequency: 440,
@@ -50,38 +53,56 @@ const Index = () => {
     toast(`Playing ${synthParams.waveform} wave at ${synthParams.frequency}Hz`);
   };
 
-  const handleSequencerStep = (step: number, isActive: boolean) => {
-    setCurrentStep(step);
-    if (isActive && isInitialized) {
-      // Play tracks that have this step active
-      const tracksToPlay = tracks.filter(track => {
-        const hasSoloTracks = tracks.some(t => t.solo);
-        const shouldPlay = hasSoloTracks ? track.solo && !track.muted : !track.muted;
-        return shouldPlay && track.steps[step];
-      });
+  const playActiveTracksForStep = useCallback((step: number) => {
+    if (!isInitialized) return;
+    
+    const hasSoloTracks = tracks.some(t => t.solo);
+    const playableTracks = tracks.filter(track => {
+      const shouldPlay = hasSoloTracks ? track.solo && !track.muted : !track.muted;
+      return shouldPlay && track.steps[step];
+    });
 
-      tracksToPlay.forEach(track => {
-        const adjustedParams = { ...track.params, volume: track.params.volume * track.volume };
-        playTone(adjustedParams, 0.2);
-      });
-    }
-  };
+    playableTracks.forEach(track => {
+      const adjustedParams = { ...track.params, volume: track.params.volume * track.volume };
+      playTone(adjustedParams, 0.2);
+    });
+  }, [tracks, isInitialized, playTone]);
 
-  const handleTrackSequencerPlay = (trackId: string) => {
+  const startTransport = useCallback(() => {
     if (!isInitialized) {
       toast("Initialize audio first!");
       return;
     }
+
+    const stepMs = (60 / bpm / 4) * 1000; // 16th notes
+    setIsTransportPlaying(true);
+    setCurrentStep(0);
     
-    const track = tracks.find(t => t.id === trackId);
-    if (track) {
-      setIsPlaying(true);
-      const adjustedParams = { ...track.params, volume: track.params.volume * track.volume };
-      playTone(adjustedParams, 0.5);
-      setTimeout(() => setIsPlaying(false), 500);
-      toast(`Playing ${track.name}`);
+    intervalRef.current = setInterval(() => {
+      setCurrentStep(prevStep => {
+        const nextStep = (prevStep + 1) % stepsCount;
+        playActiveTracksForStep(nextStep);
+        return nextStep;
+      });
+    }, stepMs);
+  }, [bpm, stepsCount, playActiveTracksForStep, isInitialized]);
+
+  const stopTransport = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
-  };
+    setIsTransportPlaying(false);
+    setCurrentStep(-1);
+  }, []);
+
+  const toggleTransport = useCallback(() => {
+    if (isTransportPlaying) {
+      stopTransport();
+    } else {
+      startTransport();
+    }
+  }, [isTransportPlaying, startTransport, stopTransport]);
 
   const handleTrackPlay = (track: Track) => {
     if (!isInitialized) {
@@ -112,6 +133,56 @@ const Index = () => {
     const preset = JSON.stringify(synthParams, null, 2);
     navigator.clipboard.writeText(preset);
     toast("Preset copied to clipboard!");
+  };
+
+  const loadBasic909Kit = () => {
+    const kickPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Kick");
+    const snarePreset = ROLAND_909_PRESETS.find(p => p.name === "909 Snare");
+    const hihatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Closed Hat");
+    
+    const newTracks: Track[] = [];
+    
+    if (kickPreset) {
+      const kickTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Kick",
+        params: kickPreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.8,
+        steps: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false]
+      };
+      newTracks.push(kickTrack);
+    }
+    
+    if (snarePreset) {
+      const snareTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Snare",
+        params: snarePreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.7,
+        steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]
+      };
+      newTracks.push(snareTrack);
+    }
+    
+    if (hihatPreset) {
+      const hihatTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Hi-Hat",
+        params: hihatPreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.5,
+        steps: [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false]
+      };
+      newTracks.push(hihatTrack);
+    }
+    
+    setTracks(newTracks);
+    toast("Loaded basic 909 kit!");
   };
 
   return (
@@ -169,15 +240,24 @@ const Index = () => {
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Master Transport */}
+            <MasterTransport
+              bpm={bpm}
+              isPlaying={isTransportPlaying}
+              currentStep={currentStep}
+              stepsCount={stepsCount}
+              onTogglePlay={toggleTransport}
+              onBpmChange={setBpm}
+            />
+
             {/* Multi-Track Mixer */}
             <TrackMixer
               tracks={tracks}
               onTracksChange={setTracks}
               onTrackPlay={handleTrackPlay}
               onTrackEdit={handleTrackEdit}
-              isPlaying={globalSequencerPlaying}
+              isPlaying={isTransportPlaying}
               currentStep={currentStep}
-              onSequencerPlay={handleTrackSequencerPlay}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -189,21 +269,16 @@ const Index = () => {
                   onPlayNote={handlePlayNote}
                 />
                 
-                <Sequencer
-                  bpm={120}
-                  onStepPlay={handleSequencerStep}
-                />
-                
                 <div className="control-section">
                   <div className="panel-header">
-                    <h3 className="text-lg font-bold neon-text">Global Sequencer</h3>
+                    <h3 className="text-lg font-bold neon-text">Quick Actions</h3>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setGlobalSequencerPlaying(!globalSequencerPlaying)}
+                      onClick={loadBasic909Kit}
                       className="ml-auto"
                     >
-                      {globalSequencerPlaying ? "Stop" : "Start"} All Tracks
+                      Load 909 Kit
                     </Button>
                   </div>
                 </div>
@@ -270,6 +345,8 @@ const Index = () => {
           onOpenChange={setIsTrackEditorOpen}
           onTrackUpdate={handleTrackUpdate}
           onTrackPlay={handleTrackPlay}
+          isTransportPlaying={isTransportPlaying}
+          currentStep={currentStep}
         />
       </main>
     </div>
