@@ -56,14 +56,21 @@ const Index = () => {
   const playActiveTracksForStep = useCallback((step: number) => {
     if (!isInitialized) return;
     
+    console.log(`[Transport] Step ${step}, Total tracks: ${tracks.length}`);
+    
     const hasSoloTracks = tracks.some(t => t.solo);
     const playableTracks = tracks.filter(track => {
       const shouldPlay = hasSoloTracks ? track.solo && !track.muted : !track.muted;
-      return shouldPlay && track.steps[step];
+      const hasActiveStep = track.steps[step];
+      console.log(`[Transport] Track "${track.name}": shouldPlay=${shouldPlay}, hasActiveStep=${hasActiveStep}, step[${step}]=${track.steps[step]}`);
+      return shouldPlay && hasActiveStep;
     });
 
+    console.log(`[Transport] Playing ${playableTracks.length} tracks for step ${step}`);
+    
     playableTracks.forEach(track => {
       const adjustedParams = { ...track.params, volume: track.params.volume * track.volume };
+      console.log(`[Transport] Playing track "${track.name}": ${track.params.frequency}Hz ${track.params.waveform}`);
       playTone(adjustedParams, 0.2);
     });
   }, [tracks, isInitialized, playTone]);
@@ -78,9 +85,13 @@ const Index = () => {
     setIsTransportPlaying(true);
     setCurrentStep(0);
     
+    // Play the initial step immediately
+    playActiveTracksForStep(0);
+    
     intervalRef.current = setInterval(() => {
       setCurrentStep(prevStep => {
         const nextStep = (prevStep + 1) % stepsCount;
+        // Play the step we're moving TO, not the one we're coming from
         playActiveTracksForStep(nextStep);
         return nextStep;
       });
@@ -136,9 +147,13 @@ const Index = () => {
   };
 
   const loadBasic909Kit = () => {
+    console.log("[909Kit] Available presets:", ROLAND_909_PRESETS.map(p => p.name));
+    
     const kickPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Kick");
     const snarePreset = ROLAND_909_PRESETS.find(p => p.name === "909 Snare");
     const hihatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Closed Hat");
+    
+    console.log("[909Kit] Found presets:", { kickPreset: !!kickPreset, snarePreset: !!snarePreset, hihatPreset: !!hihatPreset });
     
     const newTracks: Track[] = [];
     
@@ -153,6 +168,7 @@ const Index = () => {
         steps: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false]
       };
       newTracks.push(kickTrack);
+      console.log("[909Kit] Added kick track:", kickTrack.params.frequency, kickTrack.params.waveform);
     }
     
     if (snarePreset) {
@@ -166,6 +182,7 @@ const Index = () => {
         steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]
       };
       newTracks.push(snareTrack);
+      console.log("[909Kit] Added snare track:", snareTrack.params.frequency, snareTrack.params.waveform);
     }
     
     if (hihatPreset) {
@@ -179,8 +196,10 @@ const Index = () => {
         steps: [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false]
       };
       newTracks.push(hihatTrack);
+      console.log("[909Kit] Added hihat track:", hihatTrack.params.frequency, hihatTrack.params.waveform);
     }
     
+    console.log("[909Kit] Total tracks created:", newTracks.length);
     setTracks(newTracks);
     toast("Loaded basic 909 kit!");
   };
