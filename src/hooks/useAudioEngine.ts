@@ -88,6 +88,7 @@ export const useAudioEngine = () => {
       
       setAudioContext(ctx);
       setIsInitialized(true);
+      console.log('[AudioEngine] Successfully initialized, masterGain value:', masterGain.gain.value);
     } catch (error) {
       console.error('Failed to initialize audio context:', error);
     }
@@ -108,14 +109,25 @@ export const useAudioEngine = () => {
   }, [audioContext]);
 
   const playTone = useCallback((params: AudioParams, duration: number = 0.5) => {
-    if (!audioContext || !masterGainRef.current) return;
+    if (!audioContext || !masterGainRef.current) {
+      console.error('[AudioEngine] Missing audioContext or masterGain:', { 
+        hasContext: !!audioContext, 
+        hasMasterGain: !!masterGainRef.current 
+      });
+      return;
+    }
 
     // Ensure context is running before playing (safety on some browsers)
     if (audioContext.state === 'suspended') {
-      audioContext.resume().catch(() => {
-        console.warn('[AudioEngine] Resume failed inside playTone');
+      console.warn('[AudioEngine] Context suspended, attempting to resume...');
+      audioContext.resume().then(() => {
+        console.log('[AudioEngine] Context resumed successfully');
+      }).catch((e) => {
+        console.error('[AudioEngine] Resume failed inside playTone:', e);
       });
     }
+
+    console.log('[AudioEngine] PlayTone called with state:', audioContext.state);
 
     const now = audioContext.currentTime;
     const attackTime = params.attack / 1000;
@@ -191,7 +203,7 @@ export const useAudioEngine = () => {
       
       noiseSource.onended = cleanup;
       
-      console.log('[AudioEngine] playDrum', { freq: params.frequency, noiseLevel, duration });
+      console.log('[AudioEngine] playDrum', { freq: params.frequency, noiseLevel, duration, contextState: audioContext.state });
       return noiseSource;
     } else {
       // Regular oscillator synthesis
