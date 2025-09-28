@@ -13,62 +13,35 @@ import { toast } from "sonner";
 
 // Human-readable format: bpm:130|kick:1010101010101010:60:0.8:false:false|snare:0001000100010001:200:0.7:false:false
 const encodeSequenceToReadable = (tracks: Track[], bpm: number) => {
-  const trackStrings = tracks.map(track => {
-    const steps = track.steps.map(s => s ? '1' : '0').join('');
-    const frequency = Math.round(track.params.frequency);
-    const volume = Math.round(track.volume * 100) / 100;
-    const muted = track.muted ? 'true' : 'false';
-    const solo = track.solo ? 'true' : 'false';
-    
-    return `${track.name}:${steps}:${frequency}:${volume}:${muted}:${solo}`;
-  });
+  // Use base64 encoding for complete parameter preservation
+  const sequenceData = {
+    bpm,
+    tracks: tracks.map(track => ({
+      name: track.name,
+      params: track.params,
+      muted: track.muted,
+      solo: track.solo,
+      volume: track.volume,
+      steps: track.steps
+    }))
+  };
   
-  return `bpm:${bpm}|${trackStrings.join('|')}`;
+  const encoded = btoa(JSON.stringify(sequenceData));
+  return encoded;
 };
 
 const decodeSequenceFromReadable = (readable: string): { tracks: Track[], bpm: number } | null => {
   try {
-    const parts = readable.split('|');
-    const bpmPart = parts[0];
+    // Try base64 decoding first (new format)
+    const decoded = JSON.parse(atob(readable));
+    const tracks = decoded.tracks.map((track: any) => ({
+      ...track,
+      id: crypto.randomUUID() // Generate new IDs for shared tracks
+    }));
     
-    if (!bpmPart.startsWith('bpm:')) return null;
-    
-    const bpm = parseInt(bpmPart.split(':')[1]);
-    const tracks: Track[] = [];
-    
-    for (let i = 1; i < parts.length; i++) {
-      const trackParts = parts[i].split(':');
-      if (trackParts.length !== 6) continue;
-      
-      const [name, stepsStr, freqStr, volStr, mutedStr, soloStr] = trackParts;
-      const steps = stepsStr.split('').map(s => s === '1');
-      
-      tracks.push({
-        id: crypto.randomUUID(),
-        name,
-        params: {
-          frequency: parseInt(freqStr),
-          filterFreq: 1000,
-          filterQ: 1,
-          attack: 0.01,
-          decay: 0.1,
-          sustain: 0.3,
-          release: 0.5,
-          waveform: 'sine' as const,
-          volume: 0.8,
-          delay: 0,
-          reverb: 0
-        },
-        muted: mutedStr === 'true',
-        solo: soloStr === 'true',
-        volume: parseFloat(volStr),
-        steps
-      });
-    }
-    
-    return { tracks, bpm };
+    return { tracks, bpm: decoded.bpm || 130 };
   } catch (error) {
-    console.error('Failed to decode readable sequence:', error);
+    console.error('Failed to decode sequence from URL:', error);
     return null;
   }
 };
