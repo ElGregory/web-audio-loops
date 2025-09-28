@@ -185,8 +185,10 @@ const decodeSequenceFromReadable = (readable: string): { tracks: Track[], bpm: n
 const encodeSequenceToEmbedUrl = (tracks: Track[], bpm: number) => {
   // Always use compact encoding - no fallback to loop format
   const compact = encodeSequenceToCompact(tracks, bpm);
+  console.log('Compact data:', compact, 'Length:', compact.length);
   const url = new URL(window.location.href);
   url.searchParams.set('c', compact);
+  console.log('Final URL:', url.toString(), 'Length:', url.toString().length);
   
   return url.toString();
 };
