@@ -161,17 +161,35 @@ const Index = () => {
       toast("Loaded shared sequence!");
     }
   }, []);
+
   
 
   const handleInitAudio = async () => {
     await initializeAudio();
     toast("Audio engine initialized! Ready to make some noise!");
     
-    // Auto-play if there are tracks
+    // Auto-play if there are tracks - delay to ensure audio context is ready
     if (tracks.length > 0) {
       setTimeout(() => {
-        startTransport();
-        toast("Auto-playing sequence!");
+        if (!isTransportPlaying) {
+          setIsTransportPlaying(true);
+          setCurrentStep(0);
+          
+          const stepMs = (60 / bpm / 4) * 1000;
+          
+          // Play the initial step immediately
+          playActiveTracksForStep(0);
+          
+          intervalRef.current = setInterval(() => {
+            setCurrentStep(prevStep => {
+              const nextStep = (prevStep + 1) % stepsCount;
+              playActiveTracksForStep(nextStep);
+              return nextStep;
+            });
+          }, stepMs);
+          
+          toast("Auto-playing sequence!");
+        }
       }, 500);
     }
   };
