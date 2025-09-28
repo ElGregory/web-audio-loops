@@ -470,10 +470,10 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto p-4 space-y-6">
+      <main className="container mx-auto p-2 md:p-4 space-y-4 md:space-y-6 pb-20 md:pb-6">
         {!isInitialized ? (
-          <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-            <div className="panel max-w-md p-8">
+          <div className="flex flex-col items-center justify-center min-h-[60vh] md:min-h-[400px] text-center px-4">
+            <div className="panel max-w-md p-6 md:p-8 w-full">
               <Zap className="w-16 h-16 text-accent mx-auto mb-4" />
               {hasSharedSequence() ? (
                 <>
@@ -497,7 +497,7 @@ const Index = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {/* Master Transport with Live Visualization */}
             <MasterTransport
               bpm={bpm}
