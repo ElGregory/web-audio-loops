@@ -155,35 +155,50 @@ export const useAudioEngine = () => {
       oscillator.frequency.setValueAtTime(params.frequency, now);
       if (params.pitchDecay) {
         oscillator.frequency.exponentialRampToValueAtTime(
-          params.frequency * 0.3, 
+          Math.max(params.frequency * 0.3, 20), // Prevent too low frequencies
           now + (params.pitchDecay / 1000)
         );
       }
       oscillator.connect(oscGain);
 
-      // Configure filter for drum character
-      drumFilter.type = 'bandpass';
+      // Configure filter based on frequency - use lowpass for bass, bandpass for others
+      const isBass = params.frequency < 200;
+      drumFilter.type = isBass ? 'lowpass' : 'bandpass';
       drumFilter.frequency.setValueAtTime(params.filterFreq, now);
       drumFilter.Q.setValueAtTime(params.filterQ, now);
 
-      // Set gain levels with drum boost
-      const drumBoost = 2.5; // Boost drums to compete with other sounds
-      const noiseLevel = params.noiseLevel || 0;
-      const oscLevel = 1 - noiseLevel;
+      // Set gain levels with frequency-dependent boost
+      const drumBoost = isBass ? 4.0 : 2.5; // Extra boost for bass frequencies
+      const noiseLevel = Math.max(params.noiseLevel || 0, 0.05); // Minimum noise level
+      const oscLevel = Math.max(1 - noiseLevel, 0.3); // Ensure oscillator is audible
+      
+      // Enhanced gain envelope with minimum audible levels
+      const minGain = 0.001; // More audible minimum than 0.01
       
       noiseGain.gain.setValueAtTime(0, now);
       noiseGain.gain.linearRampToValueAtTime(noiseLevel * params.volume * drumBoost, now + attackTime);
-      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + duration * 0.8);
+      noiseGain.gain.exponentialRampToValueAtTime(minGain, now + duration * 0.8);
 
       oscGain.gain.setValueAtTime(0, now);
       oscGain.gain.linearRampToValueAtTime(oscLevel * params.volume * drumBoost, now + attackTime);
-      oscGain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+      oscGain.gain.exponentialRampToValueAtTime(minGain, now + duration);
 
-      // Connect audio graph
+      // Connect main audio graph
       noiseGain.connect(mixerGain);
       oscGain.connect(mixerGain);
       mixerGain.connect(drumFilter);
       drumFilter.connect(masterGainRef.current);
+
+      // For bass frequencies, create a direct path that bypasses filtering
+      let directOscGain: GainNode | null = null;
+      if (isBass) {
+        directOscGain = audioContext.createGain();
+        oscillator.connect(directOscGain);
+        directOscGain.gain.setValueAtTime(0, now);
+        directOscGain.gain.linearRampToValueAtTime(oscLevel * params.volume * 0.5, now + attackTime);
+        directOscGain.gain.exponentialRampToValueAtTime(minGain, now + duration);
+        directOscGain.connect(masterGainRef.current);
+      }
 
       // Start sources
       noiseSource.start(now);
@@ -199,11 +214,22 @@ export const useAudioEngine = () => {
         try { oscGain.disconnect(); } catch {}
         try { mixerGain.disconnect(); } catch {}
         try { drumFilter.disconnect(); } catch {}
+        if (directOscGain) {
+          try { directOscGain.disconnect(); } catch {}
+        }
       };
       
       noiseSource.onended = cleanup;
       
-      console.log('[AudioEngine] playDrum', { freq: params.frequency, noiseLevel, duration, contextState: audioContext.state });
+      console.log('[AudioEngine] playDrum', { 
+        freq: params.frequency, 
+        noiseLevel, 
+        oscLevel,
+        filterType: drumFilter.type,
+        isBass,
+        duration, 
+        contextState: audioContext.state 
+      });
       return noiseSource;
     } else {
       // Regular oscillator synthesis
