@@ -161,10 +161,18 @@ export const useAudioEngine = () => {
       }
       oscillator.connect(oscGain);
 
-      // Configure filter for drum character
-      drumFilter.type = 'bandpass';
-      drumFilter.frequency.setValueAtTime(params.filterFreq, now);
-      drumFilter.Q.setValueAtTime(params.filterQ, now);
+      // Configure filter for drum character (adaptive for low bass)
+      const isLowBass = params.frequency < 120;
+      if (isLowBass) {
+        drumFilter.type = 'lowpass';
+        const targetFreq = Math.max(params.filterFreq, params.frequency * 2);
+        drumFilter.frequency.setValueAtTime(targetFreq, now);
+        drumFilter.Q.setValueAtTime(Math.max(0.7, Math.min(params.filterQ, 1.5)), now);
+      } else {
+        drumFilter.type = 'bandpass';
+        drumFilter.frequency.setValueAtTime(params.filterFreq, now);
+        drumFilter.Q.setValueAtTime(params.filterQ, now);
+      }
 
       // Set gain levels with drum boost
       const drumBoost = 2.5; // Boost drums to compete with other sounds
@@ -188,6 +196,10 @@ export const useAudioEngine = () => {
       oscGain.connect(mixerGain);
       mixerGain.connect(drumFilter);
       drumFilter.connect(masterGainRef.current);
+      // For very low bass, also route a parallel dry osc path to preserve sub energy
+      if (params.frequency < 120) {
+        try { oscGain.connect(masterGainRef.current); } catch {}
+      }
 
       // Start sources
       noiseSource.start(now);
