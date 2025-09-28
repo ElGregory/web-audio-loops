@@ -29,54 +29,56 @@ const encodeSequenceToCompact = (tracks: Track[], bpm: number): string => {
     pitchDecay: 0
   };
 
+  // Ultra-compact format - even more aggressive compression
   const compactData = {
-    b: bpm !== 130 ? bpm : undefined, // Only store if different from default
-    t: tracks.map(track => {
-      // Convert step pattern to hex
-      const stepsHex = track.steps.reduce((acc, step, i) => 
-        step ? acc | (1 << i) : acc, 0).toString(16);
-      
-      // Only store non-default parameters
-      const params: any = {};
-      Object.entries(track.params).forEach(([key, value]) => {
-        const defaultValue = defaultParams[key as keyof AudioParams];
-        if (value !== defaultValue) {
-          // Use short keys
-          const shortKey = {
-            frequency: 'f',
-            waveform: 'w',
-            volume: 'v',
-            attack: 'a',
-            decay: 'd',
-            sustain: 's',
-            release: 'r',
-            filterFreq: 'ff',
-            filterQ: 'fq',
-            isDrum: 'dr',
-            noiseLevel: 'nl',
-            pitchDecay: 'pd'
-          }[key] || key;
-          params[shortKey] = value;
-        }
-      });
+    ...(bpm !== 130 && { b: bpm }), // Only store if different from default
+    t: tracks.filter(track => track.steps.some(step => step)) // Remove completely empty tracks
+      .map(track => {
+        // Convert step pattern to hex (16 bits max)
+        const stepsHex = track.steps.reduce((acc, step, i) => 
+          step ? acc | (1 << i) : acc, 0).toString(16);
+        
+        // Ultra-compressed parameters - only store significantly different values
+        const params: any = {};
+        const p = track.params;
+        
+        // Use tolerance for floating point comparisons and round values
+        if (Math.abs(p.frequency - 60) > 5) params.f = Math.round(p.frequency);
+        if (p.waveform !== 'sine') params.w = p.waveform[0]; // First letter only
+        if (Math.abs(p.volume - 0.8) > 0.05) params.v = Math.round(p.volume * 100) / 100;
+        if (p.attack > 0.02) params.a = Math.round(p.attack * 1000) / 1000;
+        if (p.decay > 0.15) params.d = Math.round(p.decay * 100) / 100;
+        if (Math.abs(p.sustain - 0.3) > 0.05) params.s = Math.round(p.sustain * 100) / 100;
+        if (p.release > 0.6) params.r = Math.round(p.release * 100) / 100;
+        if (Math.abs(p.filterFreq - 2000) > 100) params.ff = Math.round(p.filterFreq);
+        if (Math.abs(p.filterQ - 1) > 0.1) params.fq = Math.round(p.filterQ * 10) / 10;
+        if (p.isDrum) params.dr = 1;
+        if (p.noiseLevel && p.noiseLevel > 0.01) params.nl = Math.round(p.noiseLevel * 100) / 100;
+        if (p.pitchDecay && p.pitchDecay > 0.01) params.pd = Math.round(p.pitchDecay * 100) / 100;
 
-      return {
-        n: track.name,
-        p: Object.keys(params).length > 0 ? params : undefined,
-        m: track.muted || undefined,
-        o: track.solo || undefined,
-        v: track.volume !== 0.8 ? track.volume : undefined,
-        s: stepsHex
-      };
-    }).filter(t => t.s !== '0') // Remove empty tracks
+        const result: any = {
+          n: track.name.slice(0, 8), // Truncate names to 8 chars
+          s: stepsHex
+        };
+        
+        // Only add these if they're not default
+        if (Object.keys(params).length > 0) result.p = params;
+        if (track.muted) result.m = 1;
+        if (track.solo) result.o = 1;
+        if (Math.abs(track.volume - 0.8) > 0.05) result.v = Math.round(track.volume * 100) / 100;
+
+        return result;
+      })
   };
 
-  return btoa(JSON.stringify(compactData));
+  // Use shorter JSON with minimal spacing
+  return btoa(JSON.stringify(compactData).replace(/"/g, "'"));
 };
 
 const decodeSequenceFromCompact = (compact: string): { tracks: Track[], bpm: number } | null => {
   try {
-    const data = JSON.parse(atob(compact));
+    // Handle the single-quote JSON format
+    const data = JSON.parse(atob(compact).replace(/'/g, '"'));
     const bpm = data.b || 130;
     
     const defaultParams: AudioParams = {
@@ -102,22 +104,28 @@ const decodeSequenceFromCompact = (compact: string): { tracks: Track[], bpm: num
       // Restore full parameters
       const params = { ...defaultParams };
       if (t.p) {
-        Object.entries(t.p).forEach(([shortKey, value]) => {
-          const fullKey = {
-            'f': 'frequency',
-            'w': 'waveform',
-            'v': 'volume',
-            'a': 'attack',
-            'd': 'decay',
-            's': 'sustain',
-            'r': 'release',
-            'ff': 'filterFreq',
-            'fq': 'filterQ',
-            'dr': 'isDrum',
-            'nl': 'noiseLevel',
-            'pd': 'pitchDecay'
-          }[shortKey] || shortKey;
-          (params as any)[fullKey] = value;
+        Object.entries(t.p).forEach(([key, value]) => {
+          if (key === 'f') params.frequency = value as number;
+          else if (key === 'w') {
+            // Restore waveform from first letter
+            const waveformMap: Record<string, OscillatorType> = {
+              's': 'sine',
+              'q': 'square', 
+              'a': 'sawtooth',
+              't': 'triangle'
+            };
+            params.waveform = waveformMap[value as string] || 'sine';
+          }
+          else if (key === 'v') params.volume = value as number;
+          else if (key === 'a') params.attack = value as number;
+          else if (key === 'd') params.decay = value as number;
+          else if (key === 's') params.sustain = value as number;
+          else if (key === 'r') params.release = value as number;
+          else if (key === 'ff') params.filterFreq = value as number;
+          else if (key === 'fq') params.filterQ = value as number;
+          else if (key === 'dr') params.isDrum = Boolean(value);
+          else if (key === 'nl') params.noiseLevel = value as number;
+          else if (key === 'pd') params.pitchDecay = value as number;
         });
       }
 
@@ -125,8 +133,8 @@ const decodeSequenceFromCompact = (compact: string): { tracks: Track[], bpm: num
         id: crypto.randomUUID(),
         name: t.n,
         params,
-        muted: t.m || false,
-        solo: t.o || false,
+        muted: Boolean(t.m),
+        solo: Boolean(t.o),
         volume: t.v || 0.8,
         steps
       };
@@ -175,14 +183,14 @@ const decodeSequenceFromReadable = (readable: string): { tracks: Track[], bpm: n
 
 
 const encodeSequenceToEmbedUrl = (tracks: Track[], bpm: number) => {
-  // Try compact encoding first
+  // Always use compact encoding first - it's now ultra-compressed
   const compact = encodeSequenceToCompact(tracks, bpm);
   const url = new URL(window.location.href);
   url.searchParams.set('c', compact);
   
-  // Check URL length - if too long, fall back to readable format
-  if (url.toString().length > 200) {
-    console.log('Compact URL too long, falling back to readable format');
+  // Only fall back if URL is extremely long (150 chars)
+  if (url.toString().length > 150) {
+    console.log('Compact URL still too long, falling back to readable format');
     url.searchParams.delete('c');
     const readable = encodeSequenceToReadable(tracks, bpm);
     url.searchParams.set('loop', readable);
