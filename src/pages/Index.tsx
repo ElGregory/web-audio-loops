@@ -173,25 +173,6 @@ const decodeSequenceFromReadable = (readable: string): { tracks: Track[], bpm: n
   }
 };
 
-// Legacy base64 format for complex sequences
-const encodeSequenceToUrl = (tracks: Track[], bpm: number) => {
-  const sequenceData = {
-    bpm,
-    tracks: tracks.map(track => ({
-      name: track.name,
-      params: track.params,
-      muted: track.muted,
-      solo: track.solo,
-      volume: track.volume,
-      steps: track.steps
-    }))
-  };
-  
-  const encoded = btoa(JSON.stringify(sequenceData));
-  const url = new URL(window.location.href);
-  url.searchParams.set('sequence', encoded);
-  return url.toString();
-};
 
 const encodeSequenceToEmbedUrl = (tracks: Track[], bpm: number) => {
   // Try compact encoding first
@@ -220,29 +201,14 @@ const decodeSequenceFromUrl = (): { tracks: Track[], bpm: number } | null => {
     if (result) return result;
   }
   
-  // Try human-readable format
+  // Fall back to readable format
   const loop = urlParams.get('loop');
   if (loop) {
     const result = decodeSequenceFromReadable(loop);
     if (result) return result;
   }
   
-  // Fall back to legacy base64 format
-  const encoded = urlParams.get('sequence');
-  if (!encoded) return null;
-  
-  try {
-    const decoded = JSON.parse(atob(encoded));
-    const tracks = decoded.tracks.map((track: any) => ({
-      ...track,
-      id: crypto.randomUUID() // Generate new IDs for shared tracks
-    }));
-    
-    return { tracks, bpm: decoded.bpm || 130 };
-  } catch (error) {
-    console.error('Failed to decode sequence from URL:', error);
-    return null;
-  }
+  return null;
 };
 
 const Index = () => {
