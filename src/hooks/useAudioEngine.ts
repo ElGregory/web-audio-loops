@@ -171,13 +171,17 @@ export const useAudioEngine = () => {
       const noiseLevel = params.noiseLevel || 0;
       const oscLevel = 1 - noiseLevel;
       
+      // Ensure minimum audible levels for very low noise scenarios
+      const effectiveNoiseLevel = Math.max(noiseLevel, 0.01);
+      const effectiveOscLevel = Math.max(oscLevel, 0.3); // Ensure bass is audible
+      
       noiseGain.gain.setValueAtTime(0, now);
-      noiseGain.gain.linearRampToValueAtTime(noiseLevel * params.volume * drumBoost, now + attackTime);
-      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + duration * 0.8);
+      noiseGain.gain.linearRampToValueAtTime(effectiveNoiseLevel * params.volume * drumBoost, now + attackTime);
+      noiseGain.gain.exponentialRampToValueAtTime(Math.max(0.001, effectiveNoiseLevel * 0.1), now + duration * 0.8);
 
       oscGain.gain.setValueAtTime(0, now);
-      oscGain.gain.linearRampToValueAtTime(oscLevel * params.volume * drumBoost, now + attackTime);
-      oscGain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+      oscGain.gain.linearRampToValueAtTime(effectiveOscLevel * params.volume * drumBoost, now + attackTime);
+      oscGain.gain.exponentialRampToValueAtTime(Math.max(0.001, effectiveOscLevel * 0.1), now + duration);
 
       // Connect audio graph
       noiseGain.connect(mixerGain);
