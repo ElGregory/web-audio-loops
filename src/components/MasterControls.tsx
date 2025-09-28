@@ -32,44 +32,50 @@ export const MasterControls = ({ settings, onSettingsChange, className }: Master
         <h3 className="text-lg font-bold neon-text">Master Controls</h3>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-        <div className="flex flex-col items-center gap-2">
-          <label className="text-xs text-muted-foreground font-medium">Master Volume</label>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
+        <div className="flex flex-col items-center gap-3 p-3 bg-card/30 rounded-lg border">
+          <label className="text-sm font-medium text-center">Master Volume</label>
           <Slider
             value={[settings.masterVolume * 100]}
             onValueChange={(value) => updateSetting('masterVolume', value[0] / 100)}
             min={0}
             max={100}
             step={1}
-            className="w-20"
+            className="w-full max-w-32 touch-pan-y"
           />
-          <span className="text-xs neon-text font-mono">{Math.round(settings.masterVolume * 100)}</span>
+          <span className="text-sm neon-text font-mono bg-background/50 px-2 py-1 rounded">
+            {Math.round(settings.masterVolume * 100)}
+          </span>
         </div>
         
-        <div className="flex flex-col items-center gap-2">
-          <label className="text-xs text-muted-foreground font-medium">Master Delay</label>
+        <div className="flex flex-col items-center gap-3 p-3 bg-card/30 rounded-lg border">
+          <label className="text-sm font-medium text-center">Master Delay</label>
           <Slider
             value={[settings.masterDelay * 1000]}
             onValueChange={(value) => updateSetting('masterDelay', value[0] / 1000)}
             min={0}
             max={500}
             step={1}
-            className="w-20"
+            className="w-full max-w-32 touch-pan-y"
           />
-          <span className="text-xs neon-text font-mono">{Math.round(settings.masterDelay * 1000)}</span>
+          <span className="text-sm neon-text font-mono bg-background/50 px-2 py-1 rounded">
+            {Math.round(settings.masterDelay * 1000)}
+          </span>
         </div>
         
-        <div className="flex flex-col items-center gap-2">
-          <label className="text-xs text-muted-foreground font-medium">Master Reverb</label>
+        <div className="flex flex-col items-center gap-3 p-3 bg-card/30 rounded-lg border sm:col-span-2 lg:col-span-1">
+          <label className="text-sm font-medium text-center">Master Reverb</label>
           <Slider
             value={[settings.masterReverb * 100]}
             onValueChange={(value) => updateSetting('masterReverb', value[0] / 100)}
             min={0}
             max={100}
             step={1}
-            className="w-20"
+            className="w-full max-w-32 touch-pan-y"
           />
-          <span className="text-xs neon-text font-mono">{Math.round(settings.masterReverb * 100)}</span>
+          <span className="text-sm neon-text font-mono bg-background/50 px-2 py-1 rounded">
+            {Math.round(settings.masterReverb * 100)}
+          </span>
         </div>
       </div>
 
@@ -78,11 +84,11 @@ export const MasterControls = ({ settings, onSettingsChange, className }: Master
         <h4 className="text-sm font-semibold text-brass">Master Filter</h4>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="flex flex-col items-center gap-2">
-          <label className="text-xs text-muted-foreground font-medium">Filter Type</label>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="flex flex-col items-center gap-3 p-3 bg-card/30 rounded-lg border">
+          <label className="text-sm font-medium text-center">Filter Type</label>
           <Select value={settings.masterFilterType} onValueChange={(value: "lowpass" | "highpass" | "bandpass" | "notch") => updateSetting('masterFilterType', value)}>
-            <SelectTrigger className="w-24 h-8 text-xs bg-secondary">
+            <SelectTrigger className="w-full h-10 text-sm bg-secondary">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -94,30 +100,34 @@ export const MasterControls = ({ settings, onSettingsChange, className }: Master
           </Select>
         </div>
         
-        <div className="flex flex-col items-center gap-2">
-          <label className="text-xs text-muted-foreground font-medium">Filter Freq</label>
+        <div className="flex flex-col items-center gap-3 p-3 bg-card/30 rounded-lg border">
+          <label className="text-sm font-medium text-center">Filter Frequency</label>
           <Slider
             value={[settings.masterFilterFreq]}
             onValueChange={(value) => updateSetting('masterFilterFreq', value[0])}
             min={20}
             max={20000}
             step={10}
-            className="w-16"
+            className="w-full touch-pan-y"
           />
-          <span className="text-xs neon-text font-mono">{settings.masterFilterFreq}</span>
+          <span className="text-sm neon-text font-mono bg-background/50 px-2 py-1 rounded">
+            {settings.masterFilterFreq}Hz
+          </span>
         </div>
         
-        <div className="flex flex-col items-center gap-2">
-          <label className="text-xs text-muted-foreground font-medium">Filter Q</label>
+        <div className="flex flex-col items-center gap-3 p-3 bg-card/30 rounded-lg border md:col-span-2 lg:col-span-2">
+          <label className="text-sm font-medium text-center">Filter Resonance (Q)</label>
           <Slider
             value={[settings.masterFilterQ]}
             onValueChange={(value) => updateSetting('masterFilterQ', value[0])}
             min={0.1}
             max={30}
             step={0.1}
-            className="w-16"
+            className="w-full max-w-48 touch-pan-y"
           />
-          <span className="text-xs neon-text font-mono">{settings.masterFilterQ.toFixed(1)}</span>
+          <span className="text-sm neon-text font-mono bg-background/50 px-2 py-1 rounded">
+            {settings.masterFilterQ.toFixed(1)}
+          </span>
         </div>
       </div>
     </div>

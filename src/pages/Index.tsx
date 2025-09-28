@@ -430,28 +430,38 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4">
+      {/* Mobile-Optimized Header */}
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-3 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Zap className="w-8 h-8 text-accent" />
+            <div className="flex items-center gap-2">
+              <Zap className="w-6 h-6 md:w-8 md:h-8 text-accent" />
               <div>
-                <h1 className="text-2xl font-bold neon-text">SteamSynth</h1>
-                <p className="text-sm text-muted-foreground">Web Audio Sound Generator</p>
+                <h1 className="text-lg md:text-2xl font-bold neon-text">SteamSynth</h1>
+                <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">Web Audio Sound Generator</p>
               </div>
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex gap-1 md:gap-2">
               {!isInitialized ? (
-                <Button onClick={handleInitAudio} className="bg-accent hover:bg-accent/80">
-                  <Zap className="w-4 h-4 mr-2" />
-                  Initialize Audio
+                <Button 
+                  onClick={handleInitAudio} 
+                  className="bg-accent hover:bg-accent/80 text-sm md:text-base px-3 md:px-4 py-2"
+                  size="sm"
+                >
+                  <Zap className="w-4 h-4 mr-1 md:mr-2" />
+                  <span className="hidden xs:inline">Initialize</span>
+                  <span className="xs:hidden">Init</span>
                 </Button>
               ) : (
-                <Button variant="outline" size="sm" onClick={handleShareEmbed}>
-                  <Share className="w-4 h-4 mr-2" />
-                  Share
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleShareEmbed}
+                  className="text-sm px-2 md:px-4"
+                >
+                  <Share className="w-4 h-4 mr-1 md:mr-2" />
+                  <span className="hidden sm:inline">Share</span>
                 </Button>
               )}
             </div>
