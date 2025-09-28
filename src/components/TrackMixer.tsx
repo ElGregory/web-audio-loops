@@ -40,8 +40,6 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
         release: 300,
         filterFreq: 2000,
         filterQ: 1,
-        delay: 0.1,
-        reverb: 0.2,
       },
       muted: false,
       solo: false,

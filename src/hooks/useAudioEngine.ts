@@ -10,8 +10,6 @@ export interface AudioParams {
   release: number;
   filterFreq: number;
   filterQ: number;
-  delay: number;
-  reverb: number;
   isDrum?: boolean;
   noiseLevel?: number;
   pitchDecay?: number;
@@ -22,9 +20,11 @@ export const useAudioEngine = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const analyserRef = useRef<AnalyserNode>();
   const masterGainRef = useRef<GainNode>();
-  const delayRef = useRef<DelayNode>();
-  const reverbRef = useRef<ConvolverNode>();
-  const filterRef = useRef<BiquadFilterNode>();
+  const masterDelayRef = useRef<DelayNode>();
+  const masterReverbRef = useRef<ConvolverNode>();
+  const masterFilterRef = useRef<BiquadFilterNode>();
+  const dryGainRef = useRef<GainNode>();
+  const wetGainRef = useRef<GainNode>();
 
   const initializeAudio = useCallback(async () => {
     if (audioContext) return;
@@ -45,34 +45,45 @@ export const useAudioEngine = () => {
       // Create audio nodes
       const analyser = ctx.createAnalyser();
       const masterGain = ctx.createGain();
-      const delay = ctx.createDelay(1.0);
-      const filter = ctx.createBiquadFilter();
+      const masterDelay = ctx.createDelay(1.0);
+      const masterFilter = ctx.createBiquadFilter();
+      const dryGain = ctx.createGain();
+      const wetGain = ctx.createGain();
       
       // Configure analyser
       analyser.fftSize = 2048;
       analyser.smoothingTimeConstant = 0.3;
       
-      // Configure master
+      // Configure master nodes
       masterGain.gain.value = 1.0;
+      dryGain.gain.value = 0.7; // Dry signal level
+      wetGain.gain.value = 0.3; // Wet signal level
       
-      // Configure filter
-      filter.type = 'lowpass';
-      filter.frequency.value = 2000;
-      filter.Q.value = 1;
+      // Configure master filter
+      masterFilter.type = 'lowpass';
+      masterFilter.frequency.value = 20000; // Start fully open
+      masterFilter.Q.value = 1;
       
-      // Set up audio chain
-      masterGain.connect(filter);
-      filter.connect(delay);
-      // Add a dry path to analyser to avoid silent output if delay behaves unexpectedly
-      filter.connect(analyser);
-      delay.connect(analyser);
+      // Configure master delay
+      masterDelay.delayTime.value = 0.1; // 100ms default delay
+      
+      // Set up master audio chain
+      // masterGain -> masterFilter -> [dry path] + [delay -> wet path] -> analyser -> destination
+      masterGain.connect(masterFilter);
+      masterFilter.connect(dryGain);
+      masterFilter.connect(masterDelay);
+      masterDelay.connect(wetGain);
+      dryGain.connect(analyser);
+      wetGain.connect(analyser);
       analyser.connect(ctx.destination);
       
       // Store references
       analyserRef.current = analyser;
       masterGainRef.current = masterGain;
-      delayRef.current = delay;
-      filterRef.current = filter;
+      masterDelayRef.current = masterDelay;
+      masterFilterRef.current = masterFilter;
+      dryGainRef.current = dryGain;
+      wetGainRef.current = wetGain;
       
       setAudioContext(ctx);
       setIsInitialized(true);
@@ -199,18 +210,7 @@ export const useAudioEngine = () => {
       gainNode.gain.setValueAtTime(params.sustain * params.volume, sustainHoldTime);
       gainNode.gain.linearRampToValueAtTime(0, now + duration);
       
-      // Update filter parameters
-      if (filterRef.current) {
-        filterRef.current.frequency.setValueAtTime(params.filterFreq, now);
-        filterRef.current.Q.setValueAtTime(params.filterQ, now);
-      }
-      
-      // Update delay
-      if (delayRef.current) {
-        delayRef.current.delayTime.setValueAtTime(params.delay, now);
-      }
-      
-      // Connect audio graph
+      // Connect audio graph directly to master gain (master effects are global)
       oscillator.connect(gainNode);
       gainNode.connect(masterGainRef.current);
       
@@ -229,11 +229,49 @@ export const useAudioEngine = () => {
     }
   }, [audioContext, createNoiseBuffer]);
 
-  const updateMasterVolume = useCallback((volume: number) => {
-    if (masterGainRef.current) {
-      masterGainRef.current.gain.setValueAtTime(volume, audioContext?.currentTime || 0);
+  const updateMasterSettings = useCallback((settings: {
+    masterVolume?: number;
+    masterFilterFreq?: number;
+    masterFilterQ?: number;
+    masterFilterType?: BiquadFilterType;
+    masterDelay?: number;
+    masterReverb?: number;
+  }) => {
+    if (!audioContext) return;
+    
+    const now = audioContext.currentTime;
+    
+    if (settings.masterVolume !== undefined && masterGainRef.current) {
+      masterGainRef.current.gain.setValueAtTime(settings.masterVolume, now);
+    }
+    
+    if (masterFilterRef.current) {
+      if (settings.masterFilterFreq !== undefined) {
+        masterFilterRef.current.frequency.setValueAtTime(settings.masterFilterFreq, now);
+      }
+      if (settings.masterFilterQ !== undefined) {
+        masterFilterRef.current.Q.setValueAtTime(settings.masterFilterQ, now);
+      }
+      if (settings.masterFilterType !== undefined) {
+        masterFilterRef.current.type = settings.masterFilterType;
+      }
+    }
+    
+    if (settings.masterDelay !== undefined && masterDelayRef.current) {
+      masterDelayRef.current.delayTime.setValueAtTime(settings.masterDelay, now);
+    }
+    
+    if (settings.masterReverb !== undefined && dryGainRef.current && wetGainRef.current) {
+      // Adjust dry/wet mix for reverb simulation
+      const reverbLevel = settings.masterReverb;
+      dryGainRef.current.gain.setValueAtTime(1 - reverbLevel, now);
+      wetGainRef.current.gain.setValueAtTime(reverbLevel, now);
     }
   }, [audioContext]);
+
+  const updateMasterVolume = useCallback((volume: number) => {
+    updateMasterSettings({ masterVolume: volume });
+  }, [updateMasterSettings]);
 
   useEffect(() => {
     return () => {
@@ -249,6 +287,7 @@ export const useAudioEngine = () => {
     isInitialized,
     initializeAudio,
     playTone,
-    updateMasterVolume
+    updateMasterVolume,
+    updateMasterSettings
   };
 };

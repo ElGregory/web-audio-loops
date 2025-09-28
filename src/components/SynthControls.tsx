@@ -165,32 +165,6 @@ export const SynthControls = ({ params, onParamsChange, onPlayNote, className }:
           />
           <span className="text-xs neon-text font-mono">{params.filterQ.toFixed(1)}</span>
         </div>
-        
-        <div className="flex flex-col items-center gap-2">
-          <label className="text-xs text-muted-foreground font-medium">Delay</label>
-          <Slider
-            value={[params.delay * 1000]}
-            onValueChange={(value) => updateParam('delay', value[0] / 1000)}
-            min={0}
-            max={500}
-            step={1}
-            className="w-16"
-          />
-          <span className="text-xs neon-text font-mono">{Math.round(params.delay * 1000)}</span>
-        </div>
-        
-        <div className="flex flex-col items-center gap-2">
-          <label className="text-xs text-muted-foreground font-medium">Reverb</label>
-          <Slider
-            value={[params.reverb * 100]}
-            onValueChange={(value) => updateParam('reverb', value[0] / 100)}
-            min={0}
-            max={100}
-            step={1}
-            className="w-16"
-          />
-          <span className="text-xs neon-text font-mono">{Math.round(params.reverb * 100)}</span>
-        </div>
       </div>
     </div>
   );

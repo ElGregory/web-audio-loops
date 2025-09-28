@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useAudioEngine } from "@/hooks/useAudioEngine";
 import { Waveform } from "@/components/Waveform";
 import { TrackMixer } from "@/components/TrackMixer";
+import { MasterControls, MasterSettings } from "@/components/MasterControls";
 import { TrackEditor } from "@/components/TrackEditor";
 import { MasterTransport } from "@/components/MasterTransport";
 import { Track, ROLAND_909_PRESETS, ROLAND_303_PRESETS } from "@/types/Track";
@@ -102,11 +103,19 @@ const decodeSequenceFromUrl = (): { tracks: Track[], bpm: number } | null => {
 };
 
 const Index = () => {
-  const { audioContext, analyser, isInitialized, initializeAudio, playTone, updateMasterVolume } = useAudioEngine();
+  const { audioContext, analyser, isInitialized, initializeAudio, playTone, updateMasterVolume, updateMasterSettings } = useAudioEngine();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(-1);
   const [bpm, setBpm] = useState(130);
   const [isTransportPlaying, setIsTransportPlaying] = useState(false);
+  const [masterSettings, setMasterSettings] = useState<MasterSettings>({
+    masterVolume: 1.0,
+    masterFilterFreq: 20000, // Fully open
+    masterFilterQ: 1,
+    masterFilterType: 'lowpass',
+    masterDelay: 0.1,
+    masterReverb: 0.0,
+  });
   const [shouldAutoplay, setShouldAutoplay] = useState(false);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [editingTrack, setEditingTrack] = useState<Track | null>(null);
@@ -149,6 +158,11 @@ const Index = () => {
       console.error('[Audio] Failed to resume context:', e);
     }
     toast("Audio engine initialized! Ready to make some noise!");
+    
+    // Initialize master settings
+    if (updateMasterSettings) {
+      updateMasterSettings(masterSettings);
+    }
     
     if (tracks.length > 0) {
       setShouldAutoplay(true);
@@ -211,7 +225,14 @@ const Index = () => {
         return nextStep;
       });
     }, stepMs);
-  }, [bpm, stepsCount, playActiveTracksForStep, isInitialized]);
+  }, [bpm, stepsCount, playActiveTracksForStep, isInitialized, audioContext]);
+
+  const handleMasterSettingsChange = (newSettings: MasterSettings) => {
+    setMasterSettings(newSettings);
+    if (updateMasterSettings) {
+      updateMasterSettings(newSettings);
+    }
+  };
 
   // Start automatically after init when a sequence exists
   useEffect(() => {
@@ -484,7 +505,13 @@ const Index = () => {
               />
             </MasterTransport>
 
-            {/* Multi-Track Mixer */}
+          {/* Master Controls */}
+          <MasterControls
+            settings={masterSettings}
+            onSettingsChange={handleMasterSettingsChange}
+          />
+
+          {/* Multi-Track Mixer */}
             <TrackMixer
               tracks={tracks}
               onTracksChange={setTracks}
