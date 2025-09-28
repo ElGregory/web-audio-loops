@@ -233,6 +233,18 @@ const Index = () => {
   const tracksRef = useRef<Track[]>(tracks);
   const stepsCount = 16;
 
+  // Suggest a musically sensible note duration based on params (ms-based)
+  const getSuggestedNoteDuration = (params: AudioParams) => {
+    const base = (params.decay + params.release) / 1000; // params are ms in presets
+    if (params.isDrum) {
+      const f = params.frequency;
+      if (f >= 3000) return Math.min(Math.max(base || 0.15, 0.08), 0.22); // hats
+      if (f < 150)   return Math.min(Math.max(base || 0.4,  0.3), 0.65);   // kicks/bass
+      return Math.min(Math.max(base || 0.25, 0.18), 0.35);                 // snares/toms
+    }
+    return Math.min(Math.max(base || 0.35, 0.2), 1.2);
+  };
+
   // Keep tracks ref updated
   useEffect(() => {
     tracksRef.current = tracks;
@@ -298,7 +310,7 @@ const Index = () => {
     playableTracks.forEach(track => {
       const adjustedParams = { ...track.params, volume: track.params.volume * track.volume };
       console.log(`[Transport] Playing track "${track.name}": ${track.params.frequency}Hz ${track.params.waveform}`);
-      playTone(adjustedParams, 0.2);
+      playTone(adjustedParams, getSuggestedNoteDuration(adjustedParams));
     });
   }, [isInitialized, playTone]);
 
@@ -377,7 +389,7 @@ const Index = () => {
     
     setIsPlaying(true);
     const adjustedParams = { ...track.params, volume: track.params.volume * track.volume };
-    playTone(adjustedParams, 0.5);
+    playTone(adjustedParams, getSuggestedNoteDuration(adjustedParams));
     setTimeout(() => setIsPlaying(false), 500);
     toast(`Playing ${track.name}`);
   };
