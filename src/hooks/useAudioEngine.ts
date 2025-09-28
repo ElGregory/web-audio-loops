@@ -16,6 +16,7 @@ export interface AudioParams {
 }
 
 export const useAudioEngine = () => {
+  console.log('useAudioEngine: Hook called');
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const analyserRef = useRef<AnalyserNode>();
@@ -233,7 +234,7 @@ export const useAudioEngine = () => {
     masterVolume?: number;
     masterFilterFreq?: number;
     masterFilterQ?: number;
-    masterFilterType?: BiquadFilterType;
+    masterFilterType?: "lowpass" | "highpass" | "bandpass" | "notch";
     masterDelay?: number;
     masterReverb?: number;
   }) => {

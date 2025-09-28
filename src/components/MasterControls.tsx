@@ -8,7 +8,7 @@ export interface MasterSettings {
   masterVolume: number;
   masterFilterFreq: number;
   masterFilterQ: number;
-  masterFilterType: BiquadFilterType;
+  masterFilterType: "lowpass" | "highpass" | "bandpass" | "notch";
   masterDelay: number;
   masterReverb: number;
 }
@@ -20,6 +20,7 @@ interface MasterControlsProps {
 }
 
 export const MasterControls = ({ settings, onSettingsChange, className }: MasterControlsProps) => {
+  console.log('MasterControls: Component rendered');
   const updateSetting = <K extends keyof MasterSettings>(key: K, value: MasterSettings[K]) => {
     onSettingsChange({ ...settings, [key]: value });
   };
@@ -80,7 +81,7 @@ export const MasterControls = ({ settings, onSettingsChange, className }: Master
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="flex flex-col items-center gap-2">
           <label className="text-xs text-muted-foreground font-medium">Filter Type</label>
-          <Select value={settings.masterFilterType} onValueChange={(value: BiquadFilterType) => updateSetting('masterFilterType', value)}>
+          <Select value={settings.masterFilterType} onValueChange={(value: "lowpass" | "highpass" | "bandpass" | "notch") => updateSetting('masterFilterType', value)}>
             <SelectTrigger className="w-24 h-8 text-xs bg-secondary">
               <SelectValue />
             </SelectTrigger>

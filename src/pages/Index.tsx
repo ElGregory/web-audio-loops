@@ -103,6 +103,7 @@ const decodeSequenceFromUrl = (): { tracks: Track[], bpm: number } | null => {
 };
 
 const Index = () => {
+  console.log('Index.tsx: Starting component initialization');
   const { audioContext, analyser, isInitialized, initializeAudio, playTone, updateMasterVolume, updateMasterSettings } = useAudioEngine();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(-1);
