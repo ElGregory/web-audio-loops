@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { useAudioEngine } from "@/hooks/useAudioEngine";
+import { useAudioEngine, AudioParams } from "@/hooks/useAudioEngine";
 import { Waveform } from "@/components/Waveform";
 import { TrackMixer } from "@/components/TrackMixer";
 import { MasterControls, MasterSettings } from "@/components/MasterControls";
@@ -12,9 +12,135 @@ import { toast } from "sonner";
 
 // URL sharing utilities
 
-// Human-readable format: bpm:130|kick:1010101010101010:60:0.8:false:false|snare:0001000100010001:200:0.7:false:false
+// Compact format with bit-packed steps and compressed parameters
+const encodeSequenceToCompact = (tracks: Track[], bpm: number): string => {
+  const defaultParams: AudioParams = {
+    frequency: 60,
+    waveform: 'sine' as OscillatorType,
+    volume: 0.8,
+    attack: 0.01,
+    decay: 0.1,
+    sustain: 0.3,
+    release: 0.5,
+    filterFreq: 2000,
+    filterQ: 1,
+    isDrum: false,
+    noiseLevel: 0,
+    pitchDecay: 0
+  };
+
+  const compactData = {
+    b: bpm !== 130 ? bpm : undefined, // Only store if different from default
+    t: tracks.map(track => {
+      // Convert step pattern to hex
+      const stepsHex = track.steps.reduce((acc, step, i) => 
+        step ? acc | (1 << i) : acc, 0).toString(16);
+      
+      // Only store non-default parameters
+      const params: any = {};
+      Object.entries(track.params).forEach(([key, value]) => {
+        const defaultValue = defaultParams[key as keyof AudioParams];
+        if (value !== defaultValue) {
+          // Use short keys
+          const shortKey = {
+            frequency: 'f',
+            waveform: 'w',
+            volume: 'v',
+            attack: 'a',
+            decay: 'd',
+            sustain: 's',
+            release: 'r',
+            filterFreq: 'ff',
+            filterQ: 'fq',
+            isDrum: 'dr',
+            noiseLevel: 'nl',
+            pitchDecay: 'pd'
+          }[key] || key;
+          params[shortKey] = value;
+        }
+      });
+
+      return {
+        n: track.name,
+        p: Object.keys(params).length > 0 ? params : undefined,
+        m: track.muted || undefined,
+        o: track.solo || undefined,
+        v: track.volume !== 0.8 ? track.volume : undefined,
+        s: stepsHex
+      };
+    }).filter(t => t.s !== '0') // Remove empty tracks
+  };
+
+  return btoa(JSON.stringify(compactData));
+};
+
+const decodeSequenceFromCompact = (compact: string): { tracks: Track[], bpm: number } | null => {
+  try {
+    const data = JSON.parse(atob(compact));
+    const bpm = data.b || 130;
+    
+    const defaultParams: AudioParams = {
+      frequency: 60,
+      waveform: 'sine' as OscillatorType,
+      volume: 0.8,
+      attack: 0.01,
+      decay: 0.1,
+      sustain: 0.3,
+      release: 0.5,
+      filterFreq: 2000,
+      filterQ: 1,
+      isDrum: false,
+      noiseLevel: 0,
+      pitchDecay: 0
+    };
+
+    const tracks: Track[] = data.t.map((t: any) => {
+      // Decode hex steps back to boolean array
+      const stepsHex = parseInt(t.s, 16);
+      const steps = Array.from({ length: 16 }, (_, i) => Boolean(stepsHex & (1 << i)));
+      
+      // Restore full parameters
+      const params = { ...defaultParams };
+      if (t.p) {
+        Object.entries(t.p).forEach(([shortKey, value]) => {
+          const fullKey = {
+            'f': 'frequency',
+            'w': 'waveform',
+            'v': 'volume',
+            'a': 'attack',
+            'd': 'decay',
+            's': 'sustain',
+            'r': 'release',
+            'ff': 'filterFreq',
+            'fq': 'filterQ',
+            'dr': 'isDrum',
+            'nl': 'noiseLevel',
+            'pd': 'pitchDecay'
+          }[shortKey] || shortKey;
+          (params as any)[fullKey] = value;
+        });
+      }
+
+      return {
+        id: crypto.randomUUID(),
+        name: t.n,
+        params,
+        muted: t.m || false,
+        solo: t.o || false,
+        volume: t.v || 0.8,
+        steps
+      };
+    });
+
+    return { tracks, bpm };
+  } catch (error) {
+    console.error('Failed to decode compact sequence:', error);
+    return null;
+  }
+};
+
+// Legacy readable format for fallback
 const encodeSequenceToReadable = (tracks: Track[], bpm: number) => {
-  // Use base64 encoding for complete parameter preservation
   const sequenceData = {
     bpm,
     tracks: tracks.map(track => ({
@@ -68,23 +194,40 @@ const encodeSequenceToUrl = (tracks: Track[], bpm: number) => {
 };
 
 const encodeSequenceToEmbedUrl = (tracks: Track[], bpm: number) => {
-  const readable = encodeSequenceToReadable(tracks, bpm);
+  // Try compact encoding first
+  const compact = encodeSequenceToCompact(tracks, bpm);
   const url = new URL(window.location.href);
-  url.searchParams.set('loop', readable);
+  url.searchParams.set('c', compact);
+  
+  // Check URL length - if too long, fall back to readable format
+  if (url.toString().length > 200) {
+    console.log('Compact URL too long, falling back to readable format');
+    url.searchParams.delete('c');
+    const readable = encodeSequenceToReadable(tracks, bpm);
+    url.searchParams.set('loop', readable);
+  }
+  
   return url.toString();
 };
 
 const decodeSequenceFromUrl = (): { tracks: Track[], bpm: number } | null => {
   const urlParams = new URLSearchParams(window.location.search);
   
-  // Try human-readable format first
+  // Try compact format first
+  const compact = urlParams.get('c');
+  if (compact) {
+    const result = decodeSequenceFromCompact(compact);
+    if (result) return result;
+  }
+  
+  // Try human-readable format
   const loop = urlParams.get('loop');
   if (loop) {
     const result = decodeSequenceFromReadable(loop);
     if (result) return result;
   }
   
-  // Fall back to base64 format
+  // Fall back to legacy base64 format
   const encoded = urlParams.get('sequence');
   if (!encoded) return null;
   
@@ -418,10 +561,13 @@ const Index = () => {
     }
 
     const embedUrl = encodeSequenceToEmbedUrl(tracks, bpm);
+    const isCompact = embedUrl.includes('?c=');
+    const charCount = embedUrl.length;
     
     try {
       await navigator.clipboard.writeText(embedUrl);
-      toast("Embed URL copied to clipboard!");
+      const format = isCompact ? 'Compact' : 'Full';
+      toast(`${format} URL copied! (${charCount} chars) ${charCount < 200 ? '✅ LinkedIn-friendly' : '⚠️ May be too long for some platforms'}`);
     } catch (error) {
       toast("Failed to copy to clipboard");
       console.error("Clipboard error:", error);
