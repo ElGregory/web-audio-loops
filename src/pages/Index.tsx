@@ -183,18 +183,10 @@ const decodeSequenceFromReadable = (readable: string): { tracks: Track[], bpm: n
 
 
 const encodeSequenceToEmbedUrl = (tracks: Track[], bpm: number) => {
-  // Always use compact encoding first - it's now ultra-compressed
+  // Always use compact encoding - no fallback to loop format
   const compact = encodeSequenceToCompact(tracks, bpm);
   const url = new URL(window.location.href);
   url.searchParams.set('c', compact);
-  
-  // Only fall back if URL is extremely long (150 chars)
-  if (url.toString().length > 150) {
-    console.log('Compact URL still too long, falling back to readable format');
-    url.searchParams.delete('c');
-    const readable = encodeSequenceToReadable(tracks, bpm);
-    url.searchParams.set('loop', readable);
-  }
   
   return url.toString();
 };
