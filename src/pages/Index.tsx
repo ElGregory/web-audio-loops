@@ -134,6 +134,7 @@ const Index = () => {
   const [currentStep, setCurrentStep] = useState(-1);
   const [bpm, setBpm] = useState(130);
   const [isTransportPlaying, setIsTransportPlaying] = useState(false);
+  const [shouldAutoplay, setShouldAutoplay] = useState(false);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [editingTrack, setEditingTrack] = useState<Track | null>(null);
   const [isTrackEditorOpen, setIsTrackEditorOpen] = useState(false);
@@ -166,31 +167,18 @@ const Index = () => {
 
   const handleInitAudio = async () => {
     await initializeAudio();
+    try {
+      if (audioContext?.state === 'suspended') {
+        await audioContext.resume();
+        console.log('[Audio] Context resumed after init');
+      }
+    } catch (e) {
+      console.error('[Audio] Failed to resume context:', e);
+    }
     toast("Audio engine initialized! Ready to make some noise!");
     
-    // Auto-play if there are tracks - delay to ensure audio context is ready
     if (tracks.length > 0) {
-      setTimeout(() => {
-        if (!isTransportPlaying) {
-          setIsTransportPlaying(true);
-          setCurrentStep(0);
-          
-          const stepMs = (60 / bpm / 4) * 1000;
-          
-          // Play the initial step immediately
-          playActiveTracksForStep(0);
-          
-          intervalRef.current = setInterval(() => {
-            setCurrentStep(prevStep => {
-              const nextStep = (prevStep + 1) % stepsCount;
-              playActiveTracksForStep(nextStep);
-              return nextStep;
-            });
-          }, stepMs);
-          
-          toast("Auto-playing sequence!");
-        }
-      }, 500);
+      setShouldAutoplay(true);
     }
   };
 
@@ -252,6 +240,15 @@ const Index = () => {
     }, stepMs);
   }, [bpm, stepsCount, playActiveTracksForStep, isInitialized]);
 
+  // Start automatically after init when a sequence exists
+  useEffect(() => {
+    if (shouldAutoplay && isInitialized && !isTransportPlaying) {
+      startTransport();
+      toast("Auto-playing sequence!");
+      setShouldAutoplay(false);
+    }
+  }, [shouldAutoplay, isInitialized, isTransportPlaying, startTransport]);
+  
   const stopTransport = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
