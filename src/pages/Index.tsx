@@ -185,15 +185,7 @@ const decodeSequenceFromReadable = (readable: string): { tracks: Track[], bpm: n
 const encodeSequenceToEmbedUrl = (tracks: Track[], bpm: number) => {
   // Always use compact encoding - build a clean URL with only ?c=
   const compact = encodeSequenceToCompact(tracks, bpm);
-  
-  // Use production URL if we're in a Lovable staging environment
-  const currentHost = window.location.hostname;
-  const isLovableStaging = currentHost.includes('lovable.app') || currentHost.includes('lovable.dev');
-  const baseUrl = isLovableStaging 
-    ? `${window.location.protocol}//${currentHost}${window.location.pathname}`
-    : `${window.location.origin}${window.location.pathname}`;
-  
-  const url = new URL(baseUrl);
+  const url = new URL(window.location.origin + window.location.pathname);
   url.searchParams.set('c', compact);
   return url.toString();
 };
