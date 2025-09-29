@@ -500,12 +500,16 @@ const Index = () => {
 
   const loadAcidTechno = () => {
     const acidBassPreset = ROLAND_303_PRESETS.find(p => p.name === "303 Acid Bass");
+    const squelchPreset = ROLAND_303_PRESETS.find(p => p.name === "303 Squelch");
     const leadPreset = ROLAND_303_PRESETS.find(p => p.name === "303 Lead");
     const kickPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Kick");
+    const snarePreset = ROLAND_909_PRESETS.find(p => p.name === "909 Snare");
+    const hihatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Hi-Hat");
     const openHatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Open Hat");
     
     const newTracks: Track[] = [];
     
+    // Four-on-the-floor kick with variations
     if (kickPreset) {
       const kickTrack: Track = {
         id: crypto.randomUUID(),
@@ -514,39 +518,70 @@ const Index = () => {
         muted: false,
         solo: false,
         volume: 0.9,
-        steps: [true, false, false, false, false, false, true, false, true, false, false, false, false, false, true, false]
+        steps: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, true]
       };
       newTracks.push(kickTrack);
     }
     
+    // Acid bass with classic 16th note pattern
     if (acidBassPreset) {
       const bassTrack: Track = {
         id: crypto.randomUUID(),
         name: "Acid Bass",
-        params: acidBassPreset.params,
+        params: { ...acidBassPreset.params, filterFreq: 600, filterQ: 10 }, // More aggressive filter
         muted: false,
         solo: false,
-        volume: 0.7,
-        steps: [true, false, true, true, false, true, false, true, true, false, true, true, false, true, false, true]
+        volume: 0.8,
+        steps: [true, false, true, true, false, true, false, true, true, false, true, false, true, true, false, true]
       };
       newTracks.push(bassTrack);
     }
     
-    if (leadPreset) {
-      const leadTrack: Track = {
+    // Squelchy bass for extra acid flavor
+    if (squelchPreset) {
+      const squelchTrack: Track = {
         id: crypto.randomUUID(),
-        name: "Lead",
-        params: leadPreset.params,
+        name: "Squelch",
+        params: { ...squelchPreset.params, filterFreq: 300, filterQ: 15 }, // Very aggressive squelch
         muted: false,
         solo: false,
         volume: 0.6,
-        steps: [false, false, false, false, false, false, false, false, true, false, false, true, false, false, true, false]
+        steps: [false, true, false, false, true, false, true, false, false, true, false, true, false, false, true, false]
       };
-      newTracks.push(leadTrack);
+      newTracks.push(squelchTrack);
     }
     
+    // Snare on 2 and 4 (classic techno)
+    if (snarePreset) {
+      const snareTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Snare",
+        params: snarePreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.7,
+        steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]
+      };
+      newTracks.push(snareTrack);
+    }
+    
+    // Driving hi-hats
+    if (hihatPreset) {
+      const hihatTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Hi-Hat",
+        params: hihatPreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.5,
+        steps: [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false]
+      };
+      newTracks.push(hihatTrack);
+    }
+    
+    // Occasional open hats for atmosphere
     if (openHatPreset) {
-      const hatTrack: Track = {
+      const openHatTrack: Track = {
         id: crypto.randomUUID(),
         name: "Open Hat",
         params: openHatPreset.params,
@@ -555,12 +590,26 @@ const Index = () => {
         volume: 0.4,
         steps: [false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, true]
       };
-      newTracks.push(hatTrack);
+      newTracks.push(openHatTrack);
+    }
+    
+    // Lead arpeggios for melodic interest
+    if (leadPreset) {
+      const leadTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Lead Arp",
+        params: { ...leadPreset.params, frequency: 330, filterFreq: 1800, attack: 2 }, // Higher pitch, sharper attack
+        muted: false,
+        solo: false,
+        volume: 0.5,
+        steps: [false, false, false, true, false, false, true, false, false, false, false, true, false, false, true, false]
+      };
+      newTracks.push(leadTrack);
     }
     
     setTracks(newTracks);
-    setBpm(130);
-    toast("Loaded acid techno sequence!");
+    setBpm(135); // Slightly faster for more driving energy
+    toast("Loaded improved acid techno sequence!");
   };
 
 
