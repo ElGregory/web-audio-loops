@@ -275,6 +275,10 @@ const Index = () => {
         await audioContext.resume();
         console.log('[Audio] Context resumed after init');
       }
+      if (audioContext?.state === 'closed') {
+        // Edge case: if previous context was closed, try initializing again
+        await initializeAudio();
+      }
     } catch (e) {
       console.error('[Audio] Failed to resume context:', e);
     }
@@ -320,7 +324,11 @@ const Index = () => {
       return;
     }
 
-    // Ensure audio context is running before starting transport
+    // Ensure audio context is ready before starting transport
+    if (audioContext?.state === 'closed') {
+      toast("Audio engine is closed. Click Initialize to re-create it.");
+      return;
+    }
     if (audioContext?.state === 'suspended') {
       audioContext.resume().then(() => {
         console.log('[Transport] Audio context resumed');
@@ -384,6 +392,10 @@ const Index = () => {
   const handleTrackPlay = (track: Track) => {
     if (!isInitialized) {
       toast("Initialize audio first!");
+      return;
+    }
+    if (audioContext?.state === 'closed') {
+      toast("Audio engine is closed. Click Initialize to re-create it.");
       return;
     }
     

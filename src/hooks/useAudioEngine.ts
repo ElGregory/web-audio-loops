@@ -28,7 +28,7 @@ export const useAudioEngine = () => {
   const wetGainRef = useRef<GainNode>();
 
   const initializeAudio = useCallback(async () => {
-    if (audioContext) return;
+    if (audioContext && audioContext.state !== 'closed') return;
 
     try {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -118,6 +118,10 @@ export const useAudioEngine = () => {
     }
 
     // Ensure context is running before playing (safety on some browsers)
+    if (audioContext.state === 'closed') {
+      console.warn('[AudioEngine] Context is closed; re-initialization required');
+      return;
+    }
     if (audioContext.state === 'suspended') {
       console.warn('[AudioEngine] Context suspended, attempting to resume...');
       audioContext.resume().then(() => {
@@ -315,7 +319,12 @@ export const useAudioEngine = () => {
   useEffect(() => {
     return () => {
       if (audioContext) {
-        audioContext.close();
+        try {
+          // Prefer suspend over close to avoid entering a permanent 'closed' state during dev/HMR
+          if (audioContext.state !== 'closed') {
+            audioContext.suspend().catch(() => {});
+          }
+        } catch {}
       }
     };
   }, [audioContext]);
