@@ -179,7 +179,7 @@ export const useAudioEngine = () => {
       drumFilter.Q.setValueAtTime(params.filterQ, now);
 
       // Set gain levels with frequency-dependent boost
-      const drumBoost = isBass ? 8.0 : 6.0; // Increased boost for better audibility
+      const drumBoost = isBass ? 12.0 : 10.0; // Much higher boost to match 303 levels
       const noiseLevel = Math.max(params.noiseLevel || 0, 0.1); // Higher minimum noise level
       const oscLevel = Math.max(1 - noiseLevel, 0.5); // Higher oscillator level
       
