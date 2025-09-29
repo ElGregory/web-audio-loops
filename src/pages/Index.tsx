@@ -294,6 +294,29 @@ const Index = () => {
     }
   };
 
+  const handleTestTone = () => {
+    if (!isInitialized) {
+      toast("Initialize audio first!");
+      return;
+    }
+    const test: AudioParams = {
+      frequency: 440,
+      waveform: 'sine',
+      volume: 0.6,
+      attack: 5,
+      decay: 100,
+      sustain: 0.6,
+      release: 150,
+      filterFreq: 20000,
+      filterQ: 1,
+      isDrum: false,
+      noiseLevel: 0,
+      pitchDecay: 0,
+    };
+    playTone(test, 0.3);
+    toast('Test tone played');
+  };
+
 
   const playActiveTracksForStep = useCallback((step: number) => {
     if (!isInitialized) return;
@@ -589,15 +612,26 @@ const Index = () => {
                   <span className="xs:hidden">Init</span>
                 </Button>
               ) : (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleShareEmbed}
-                  className="text-sm px-2 md:px-4"
-                >
-                  <Share className="w-4 h-4 mr-1 md:mr-2" />
-                  <span className="hidden sm:inline">Share</span>
-                </Button>
+                <>
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    onClick={handleTestTone}
+                    className="text-sm px-2 md:px-4"
+                  >
+                    <Zap className="w-4 h-4 mr-1 md:mr-2" />
+                    Test Tone
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleShareEmbed}
+                    className="text-sm px-2 md:px-4"
+                  >
+                    <Share className="w-4 h-4 mr-1 md:mr-2" />
+                    <span className="hidden sm:inline">Share</span>
+                  </Button>
+                </>
               )}
             </div>
           </div>

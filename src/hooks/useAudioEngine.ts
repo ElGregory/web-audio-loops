@@ -15,6 +15,8 @@ export interface AudioParams {
   pitchDecay?: number;
 }
 
+const DEBUG_DIRECT_MONITOR = true;
+
 export const useAudioEngine = () => {
   console.log('useAudioEngine: Hook called');
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
@@ -133,6 +135,11 @@ export const useAudioEngine = () => {
 
     console.log('[AudioEngine] PlayTone called with state:', audioContext.state);
 
+    if (masterGainRef.current.gain.value <= 0.0001) {
+      console.warn('[AudioEngine] Master gain was near 0 – restoring to 1.0');
+      masterGainRef.current.gain.setValueAtTime(1.0, audioContext.currentTime);
+    }
+
     const now = audioContext.currentTime;
     const attackTime = params.attack / 1000;
     const decayTime = params.decay / 1000;
@@ -193,6 +200,14 @@ export const useAudioEngine = () => {
       mixerGain.connect(drumFilter);
       drumFilter.connect(masterGainRef.current);
 
+      // Optional direct monitor to bypass master chain for debugging
+      const monitorGain = DEBUG_DIRECT_MONITOR ? audioContext.createGain() : null;
+      if (monitorGain) {
+        monitorGain.gain.value = 0.2;
+        drumFilter.connect(monitorGain);
+        monitorGain.connect(audioContext.destination);
+      }
+
       // For bass frequencies, create a direct path that bypasses filtering
       let directOscGain: GainNode | null = null;
       if (isBass) {
@@ -218,6 +233,7 @@ export const useAudioEngine = () => {
         try { oscGain.disconnect(); } catch {}
         try { mixerGain.disconnect(); } catch {}
         try { drumFilter.disconnect(); } catch {}
+        try { monitorGain?.disconnect(); } catch {}
         if (directOscGain) {
           try { directOscGain.disconnect(); } catch {}
         }
@@ -253,9 +269,17 @@ export const useAudioEngine = () => {
       gainNode.gain.setValueAtTime(params.sustain * params.volume, sustainHoldTime);
       gainNode.gain.linearRampToValueAtTime(0, now + duration);
       
-      // Connect audio graph directly to master gain (master effects are global)
+      // Connect audio graph
       oscillator.connect(gainNode);
       gainNode.connect(masterGainRef.current);
+
+      // Optional direct monitor to bypass master chain for debugging
+      if (DEBUG_DIRECT_MONITOR) {
+        const monitorGain = audioContext.createGain();
+        monitorGain.gain.value = 0.2;
+        gainNode.connect(monitorGain);
+        monitorGain.connect(audioContext.destination);
+      }
       
       // Cleanup after stop
       oscillator.onended = () => {
