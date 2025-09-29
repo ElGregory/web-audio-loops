@@ -179,12 +179,12 @@ export const useAudioEngine = () => {
       drumFilter.Q.setValueAtTime(params.filterQ, now);
 
       // Set gain levels with frequency-dependent boost
-      const drumBoost = isBass ? 4.0 : 2.5; // Extra boost for bass frequencies
-      const noiseLevel = Math.max(params.noiseLevel || 0, 0.05); // Minimum noise level
-      const oscLevel = Math.max(1 - noiseLevel, 0.3); // Ensure oscillator is audible
+      const drumBoost = isBass ? 8.0 : 6.0; // Increased boost for better audibility
+      const noiseLevel = Math.max(params.noiseLevel || 0, 0.1); // Higher minimum noise level
+      const oscLevel = Math.max(1 - noiseLevel, 0.5); // Higher oscillator level
       
       // Enhanced gain envelope with minimum audible levels
-      const minGain = 0.001; // More audible minimum than 0.01
+      const minGain = 0.01; // Higher minimum gain for audibility
       
       noiseGain.gain.setValueAtTime(0, now);
       noiseGain.gain.linearRampToValueAtTime(noiseLevel * params.volume * drumBoost, now + attackTime);
@@ -203,7 +203,7 @@ export const useAudioEngine = () => {
       // Optional direct monitor to bypass master chain for debugging
       const monitorGain = DEBUG_DIRECT_MONITOR ? audioContext.createGain() : null;
       if (monitorGain) {
-        monitorGain.gain.value = 0.2;
+        monitorGain.gain.value = 0.5; // Increased monitor gain
         drumFilter.connect(monitorGain);
         monitorGain.connect(audioContext.destination);
       }
@@ -276,7 +276,7 @@ export const useAudioEngine = () => {
       // Optional direct monitor to bypass master chain for debugging
       if (DEBUG_DIRECT_MONITOR) {
         const monitorGain = audioContext.createGain();
-        monitorGain.gain.value = 0.2;
+        monitorGain.gain.value = 0.5; // Increased monitor gain
         gainNode.connect(monitorGain);
         monitorGain.connect(audioContext.destination);
       }
