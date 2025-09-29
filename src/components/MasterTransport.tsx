@@ -20,6 +20,7 @@ interface MasterTransportProps {
   onBpmChange: (bpm: number) => void;
   onLoad909Kit: () => void;
   onLoadAcidTechno: () => void;
+  onReset: () => void;
   children?: React.ReactNode;
   className?: string;
 }
@@ -33,6 +34,7 @@ export const MasterTransport = ({
   onBpmChange,
   onLoad909Kit,
   onLoadAcidTechno,
+  onReset,
   children,
   className
 }: MasterTransportProps) => {
@@ -95,10 +97,10 @@ export const MasterTransport = ({
           </div>
         </div>
 
-        {/* Quick Pattern Loaders */}
+        {/* Quick Pattern Loaders & Reset */}
         <div className="flex flex-col gap-3">
           <h4 className="text-sm font-semibold text-primary">Quick Start Patterns</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Button 
               onClick={onLoad909Kit} 
               variant="outline" 
@@ -121,6 +123,18 @@ export const MasterTransport = ({
               <div className="flex flex-col">
                 <span>Acid Techno</span>
                 <span className="text-xs opacity-75">Electronic loops</span>
+              </div>
+            </Button>
+            <Button 
+              onClick={onReset} 
+              variant="outline" 
+              size="sm"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-destructive text-destructive hover:text-destructive font-medium transition-all"
+            >
+              <span className="mr-2 text-lg">🔄</span>
+              <div className="flex flex-col">
+                <span>Reset All</span>
+                <span className="text-xs opacity-75">Clear everything</span>
               </div>
             </Button>
           </div>

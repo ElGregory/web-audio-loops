@@ -294,27 +294,25 @@ const Index = () => {
     }
   };
 
-  const handleTestTone = () => {
-    if (!isInitialized) {
-      toast("Initialize audio first!");
-      return;
-    }
-    const test: AudioParams = {
-      frequency: 440,
-      waveform: 'sine',
-      volume: 0.6,
-      attack: 5,
-      decay: 100,
-      sustain: 0.6,
-      release: 150,
-      filterFreq: 20000,
-      filterQ: 1,
-      isDrum: false,
-      noiseLevel: 0,
-      pitchDecay: 0,
-    };
-    playTone(test, 0.3);
-    toast('Test tone played');
+  const handleReset = () => {
+    setTracks([]);
+    setBpm(130);
+    setMasterSettings({
+      masterVolume: 1.0,
+      masterFilterFreq: 20000,
+      masterFilterQ: 1,
+      masterFilterType: 'lowpass',
+      masterDelay: 0.1,
+      masterReverb: 0.0,
+    });
+    stopTransport();
+    
+    // Clear URL parameters
+    const url = new URL(window.location.href);
+    url.search = '';
+    window.history.replaceState({}, '', url.toString());
+    
+    toast("Reset complete - all tracks and settings cleared!");
   };
 
 
@@ -614,13 +612,13 @@ const Index = () => {
               ) : (
                 <>
                   <Button 
-                    variant="secondary" 
+                    variant="outline" 
                     size="sm" 
-                    onClick={handleTestTone}
+                    onClick={handleReset}
                     className="text-sm px-2 md:px-4"
                   >
-                    <Zap className="w-4 h-4 mr-1 md:mr-2" />
-                    Test Tone
+                    <Settings className="w-4 h-4 mr-1 md:mr-2" />
+                    Reset
                   </Button>
                   <Button 
                     variant="outline" 
@@ -677,6 +675,7 @@ const Index = () => {
               onBpmChange={setBpm}
               onLoad909Kit={loadBasic909Kit}
               onLoadAcidTechno={loadAcidTechno}
+              onReset={handleReset}
             >
               <Waveform
                 audioContext={audioContext}
