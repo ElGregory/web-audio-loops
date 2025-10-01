@@ -5,6 +5,7 @@ import { TrackMixer } from "@/components/TrackMixer";
 import { MasterControls, MasterSettings } from "@/components/MasterControls";
 import { TrackEditor } from "@/components/TrackEditor";
 import { MasterTransport } from "@/components/MasterTransport";
+import { Soundboard } from "@/components/Soundboard";
 import { Track, ROLAND_909_PRESETS, ROLAND_303_PRESETS } from "@/types/Track";
 import { Button } from "@/components/ui/button";
 import { Zap, Settings, Save, Share } from "lucide-react";
@@ -633,6 +634,11 @@ const Index = () => {
     }
   };
 
+  const handleLoadPreset = (presetTracks: Track[], presetBpm: number) => {
+    setTracks(presetTracks);
+    setBpm(presetBpm);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile-Optimized Header */}
@@ -737,6 +743,13 @@ const Index = () => {
           <MasterControls
             settings={masterSettings}
             onSettingsChange={handleMasterSettingsChange}
+          />
+
+          {/* Soundboard */}
+          <Soundboard
+            tracks={tracks}
+            bpm={bpm}
+            onLoadPreset={handleLoadPreset}
           />
 
           {/* Multi-Track Mixer */}
