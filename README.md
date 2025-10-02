@@ -1,73 +1,90 @@
-# Welcome to your Lovable project
+# Stream Synth - Web Audio Loops
 
-## Project info
+![Stream Synth](https://storage.googleapis.com/gpt-engineer-file-uploads/MeGALhDaU9M8WrfrR6D5v9Qgyz62/social-images/social-1759098551142-Screenshot%20from%202025-09-28%2015-28-47.png)
 
-**URL**: https://lovable.dev/projects/77919ce9-c8da-4c32-9095-abef876bd39b
+A browser-based music creation tool for crafting electronic music loops. Stream Synth combines vintage-inspired synthesizers with a modern sequencer interface, allowing you to create, mix, and share your tracks instantly - no installation required.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+### 🎹 Music Production
+- **Multi-track Sequencer**: Create patterns with up to 16 steps per track
+- **Web Audio Synthesis**: Real-time audio generation using the Web Audio API
+- **Vintage Sound Engine**: Multiple waveforms (sine, square, sawtooth, triangle) with ADSR envelopes
+- **Drum Synthesis**: Built-in drum sounds with noise and pitch modulation
 
-**Use Lovable**
+### 🎚️ Mixing & Effects
+- **Per-Track Controls**: Individual volume, panning, and muting for each track
+- **Master Effects**: Global filter and delay with adjustable parameters
+- **Real-time Waveform Display**: Visual feedback of your audio output
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/77919ce9-c8da-4c32-9095-abef876bd39b) and start prompting.
+### 🎵 Presets & Workflow
+- **Genre Presets**: Pre-configured setups for House, Techno, Acid Techno, and Drum & Bass
+- **Custom Presets**: Save your own creations to local storage
+- **Soundboard**: Quick access to your saved presets
+- **Instant Sharing**: Generate shareable links to your compositions
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🎛️ Synthesis Controls
+- **ADSR Envelope**: Attack, Decay, Sustain, Release parameters
+- **Filter Section**: Adjustable cutoff frequency and resonance
+- **Master Transport**: Play, stop, and tempo control (60-200 BPM)
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
+## Technologies
 
 This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Vite** - Fast build tool and dev server
+- **TypeScript** - Type-safe JavaScript
+- **React** - UI framework
+- **Web Audio API** - Real-time audio synthesis
+- **Tailwind CSS** - Utility-first styling
+- **shadcn/ui** - Component library
 
-## How can I deploy this project?
+## Getting Started
 
-Simply open [Lovable](https://lovable.dev/projects/77919ce9-c8da-4c32-9095-abef876bd39b) and click on Share -> Publish.
+### Prerequisites
 
-## Can I connect a custom domain to my Lovable project?
+- Node.js (v16 or higher)
+- npm or yarn
 
-Yes, you can!
+### Installation
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. Clone the repository:
+```sh
+git clone <YOUR_GIT_URL>
+cd <YOUR_PROJECT_NAME>
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+2. Install dependencies:
+```sh
+npm install
+```
+
+3. Start the development server:
+```sh
+npm run dev
+```
+
+4. Open your browser and navigate to the local development URL (typically `http://localhost:5173`)
+
+### Building for Production
+
+To create a production build:
+
+```sh
+npm run build
+```
+
+The built files will be in the `dist` directory.
+
+## Usage
+
+1. **Select a Preset**: Choose from House, Techno, Acid Techno, or Drum & Bass to get started quickly
+2. **Edit Tracks**: Click on individual steps in the sequencer to create your pattern
+3. **Adjust Sounds**: Use the synth controls to modify waveforms, envelopes, and filters
+4. **Mix**: Balance your tracks using the mixer controls
+5. **Save**: Store your custom presets to the soundboard for quick recall
+6. **Share**: Generate a shareable link to send your creation to others
+
+## License
+
+This project is open source and available under the MIT License.
