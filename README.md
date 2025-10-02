@@ -64,7 +64,7 @@ npm install
 npm run dev
 ```
 
-4. Open your browser and navigate to the local development URL (typically `http://localhost:5173`)
+4. Open your browser and navigate to the local development URL (typically `http://localhost:8080`)
 
 ### Building for Production
 
