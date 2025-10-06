@@ -20,7 +20,7 @@ interface MasterTransportProps {
   onBpmChange: (bpm: number) => void;
   onLoad909Kit: () => void;
   onLoadAcidTechno: () => void;
-  onLoadJungleGabber: () => void;
+  onLoadJungle: () => void;
   onReset: () => void;
   children?: React.ReactNode;
   className?: string;
@@ -35,7 +35,7 @@ export const MasterTransport = ({
   onBpmChange,
   onLoad909Kit,
   onLoadAcidTechno,
-  onLoadJungleGabber,
+  onLoadJungle,
   onReset,
   children,
   className
@@ -128,15 +128,15 @@ export const MasterTransport = ({
               </div>
             </Button>
             <Button 
-              onClick={onLoadJungleGabber} 
+              onClick={onLoadJungle} 
               variant="outline" 
               size="sm"
               className="h-12 text-sm bg-card/50 hover:bg-card border-accent text-accent hover:text-accent font-medium transition-all"
             >
               <span className="mr-2 text-lg">⚡</span>
               <div className="flex flex-col">
-                <span>Jungle/Gabber</span>
-                <span className="text-xs opacity-75">Fast & hardcore</span>
+                <span>Jungle</span>
+                <span className="text-xs opacity-75">Fast breakbeats</span>
               </div>
             </Button>
             <Button 

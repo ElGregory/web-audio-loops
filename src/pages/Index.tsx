@@ -613,13 +613,12 @@ const Index = () => {
     toast("Loaded improved acid techno sequence!");
   };
 
-  const loadJungleGabber = () => {
+  const loadJungle = () => {
     const kickPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Kick");
     const snarePreset = ROLAND_909_PRESETS.find(p => p.name === "909 Snare");
     const hihatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Hi-Hat");
     const openHatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Open Hat");
     const clapPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Clap");
-    const reeseBassPreset = BASS_PRESETS.find(p => p.name === "Reese Bass");
     const subBassPreset = BASS_PRESETS.find(p => p.name === "Sub Bass");
     const hooverPreset = LEAD_PRESETS.find(p => p.name === "Hoover");
     
@@ -695,20 +694,6 @@ const Index = () => {
       newTracks.push(openHatTrack);
     }
     
-    // Wobbling Reese bass - jungle staple
-    if (reeseBassPreset) {
-      const reeseBassTrack: Track = {
-        id: crypto.randomUUID(),
-        name: "Reese Bass",
-        params: { ...reeseBassPreset.params, frequency: 45, filterFreq: 600, filterQ: 8, decay: 400 },
-        muted: false,
-        solo: false,
-        volume: 0.85,
-        steps: [true, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false]
-      };
-      newTracks.push(reeseBassTrack);
-    }
-    
     // Sub bass for extra low end punch
     if (subBassPreset) {
       const subBassTrack: Track = {
@@ -738,8 +723,8 @@ const Index = () => {
     }
     
     setTracks(newTracks);
-    setBpm(175); // Classic jungle/hardcore tempo
-    toast("Loaded jungle/gabber madness! 🔥");
+    setBpm(170); // Classic jungle tempo
+    toast("Loaded jungle madness! 🔥");
   };
 
   const handleShareEmbed = async () => {
@@ -856,10 +841,10 @@ const Index = () => {
               stepsCount={stepsCount}
               onTogglePlay={toggleTransport}
               onBpmChange={setBpm}
-              onLoad909Kit={loadBasic909Kit}
-              onLoadAcidTechno={loadAcidTechno}
-              onLoadJungleGabber={loadJungleGabber}
-              onReset={handleReset}
+        onLoad909Kit={loadBasic909Kit}
+        onLoadAcidTechno={loadAcidTechno}
+        onLoadJungle={loadJungle}
+        onReset={handleReset}
             >
               <Waveform
                 audioContext={audioContext}
