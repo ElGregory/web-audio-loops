@@ -20,6 +20,7 @@ interface MasterTransportProps {
   onBpmChange: (bpm: number) => void;
   onLoad909Kit: () => void;
   onLoadAcidTechno: () => void;
+  onLoadClassicHipHop: () => void;
   onReset: () => void;
   children?: React.ReactNode;
   className?: string;
@@ -34,6 +35,7 @@ export const MasterTransport = ({
   onBpmChange,
   onLoad909Kit,
   onLoadAcidTechno,
+  onLoadClassicHipHop,
   onReset,
   children,
   className
@@ -100,7 +102,7 @@ export const MasterTransport = ({
         {/* Quick Pattern Loaders & Reset */}
         <div className="flex flex-col gap-3">
           <h4 className="text-sm font-semibold text-primary">Quick Start Patterns</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Button 
               onClick={onLoad909Kit} 
               variant="outline" 
@@ -123,6 +125,18 @@ export const MasterTransport = ({
               <div className="flex flex-col">
                 <span>Acid Techno</span>
                 <span className="text-xs opacity-75">Electronic loops</span>
+              </div>
+            </Button>
+            <Button 
+              onClick={onLoadClassicHipHop} 
+              variant="outline" 
+              size="sm"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-accent text-accent hover:text-accent font-medium transition-all"
+            >
+              <span className="mr-2 text-lg">🎤</span>
+              <div className="flex flex-col">
+                <span>Hip-Hop 808</span>
+                <span className="text-xs opacity-75">Classic boom bap</span>
               </div>
             </Button>
             <Button 

@@ -6,7 +6,7 @@ import { MasterControls, MasterSettings } from "@/components/MasterControls";
 import { TrackEditor } from "@/components/TrackEditor";
 import { MasterTransport } from "@/components/MasterTransport";
 import { Soundboard } from "@/components/Soundboard";
-import { Track, ROLAND_909_PRESETS, ROLAND_303_PRESETS } from "@/types/Track";
+import { Track, ROLAND_909_PRESETS, ROLAND_303_PRESETS, ROLAND_808_PRESETS, BASS_PRESETS, LEAD_PRESETS } from "@/types/Track";
 import { Button } from "@/components/ui/button";
 import { Zap, Settings, Save, Share } from "lucide-react";
 import { toast } from "sonner";
@@ -613,6 +613,104 @@ const Index = () => {
     toast("Loaded improved acid techno sequence!");
   };
 
+  const loadClassicHipHop = () => {
+    const kickPreset = ROLAND_808_PRESETS.find(p => p.name === "808 Kick");
+    const snarePreset = ROLAND_808_PRESETS.find(p => p.name === "808 Snare");
+    const clapPreset = ROLAND_808_PRESETS.find(p => p.name === "808 Clap");
+    const rimPreset = ROLAND_808_PRESETS.find(p => p.name === "808 Rim Shot");
+    const reeseBassPreset = BASS_PRESETS.find(p => p.name === "Reese Bass");
+    const pluckPreset = LEAD_PRESETS.find(p => p.name === "Pluck Synth");
+    
+    const newTracks: Track[] = [];
+    
+    // 808 kick on classic hip-hop pattern
+    if (kickPreset) {
+      const kickTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "808 Kick",
+        params: kickPreset.params,
+        muted: false,
+        solo: false,
+        volume: 1.0,
+        steps: [true, false, false, false, false, false, true, false, false, true, false, false, true, false, false, false]
+      };
+      newTracks.push(kickTrack);
+    }
+    
+    // 808 snare on 2 and 4
+    if (snarePreset) {
+      const snareTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "808 Snare",
+        params: snarePreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.9,
+        steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]
+      };
+      newTracks.push(snareTrack);
+    }
+    
+    // 808 clap for extra punch
+    if (clapPreset) {
+      const clapTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "808 Clap",
+        params: clapPreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.7,
+        steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]
+      };
+      newTracks.push(clapTrack);
+    }
+    
+    // 808 rim for texture
+    if (rimPreset) {
+      const rimTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Rim Shot",
+        params: rimPreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.6,
+        steps: [false, false, true, false, false, false, false, true, false, false, true, false, false, false, false, true]
+      };
+      newTracks.push(rimTrack);
+    }
+    
+    // Deep Reese bass
+    if (reeseBassPreset) {
+      const bassTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Reese Bass",
+        params: { ...reeseBassPreset.params, frequency: 45 }, // Lower for hip-hop
+        muted: false,
+        solo: false,
+        volume: 0.85,
+        steps: [true, false, false, false, false, false, false, false, true, false, false, false, false, false, true, false]
+      };
+      newTracks.push(bassTrack);
+    }
+    
+    // Pluck synth for melody
+    if (pluckPreset) {
+      const pluckTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Pluck",
+        params: { ...pluckPreset.params, frequency: 440 },
+        muted: false,
+        solo: false,
+        volume: 0.5,
+        steps: [false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, false]
+      };
+      newTracks.push(pluckTrack);
+    }
+    
+    setTracks(newTracks);
+    setBpm(90); // Classic hip-hop tempo
+    toast("Loaded classic hip-hop beat!");
+  };
 
   const handleShareEmbed = async () => {
     if (tracks.length === 0) {
@@ -730,6 +828,7 @@ const Index = () => {
               onBpmChange={setBpm}
               onLoad909Kit={loadBasic909Kit}
               onLoadAcidTechno={loadAcidTechno}
+              onLoadClassicHipHop={loadClassicHipHop}
               onReset={handleReset}
             >
               <Waveform
