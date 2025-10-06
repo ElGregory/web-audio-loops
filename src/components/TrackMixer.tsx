@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Track, TrackPreset, ROLAND_303_PRESETS, ROLAND_909_PRESETS } from '@/types/Track';
+import { Track, TrackPreset, ROLAND_303_PRESETS, ROLAND_808_PRESETS, ROLAND_909_PRESETS, BASS_PRESETS, LEAD_PRESETS, PAD_PRESETS } from '@/types/Track';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -24,7 +24,38 @@ interface TrackMixerProps {
 export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, isPlaying, currentStep, className }: TrackMixerProps) => {
   const [selectedPreset, setSelectedPreset] = useState<string>('');
 
-  const allPresets: TrackPreset[] = [...ROLAND_303_PRESETS, ...ROLAND_909_PRESETS];
+  const allPresets: TrackPreset[] = [
+    ...ROLAND_303_PRESETS, 
+    ...ROLAND_808_PRESETS, 
+    ...ROLAND_909_PRESETS, 
+    ...BASS_PRESETS, 
+    ...LEAD_PRESETS, 
+    ...PAD_PRESETS
+  ];
+
+  const getCategoryBadgeVariant = (category: string) => {
+    switch(category) {
+      case 'roland-303': return 'default';
+      case 'roland-808': return 'secondary';
+      case 'roland-909': return 'outline';
+      case 'bass': return 'default';
+      case 'lead': return 'secondary';
+      case 'pad': return 'outline';
+      default: return 'outline';
+    }
+  };
+
+  const getCategoryLabel = (category: string) => {
+    switch(category) {
+      case 'roland-303': return '303';
+      case 'roland-808': return '808';
+      case 'roland-909': return '909';
+      case 'bass': return 'BASS';
+      case 'lead': return 'LEAD';
+      case 'pad': return 'PAD';
+      default: return category.toUpperCase();
+    }
+  };
 
   const addTrack = (preset?: TrackPreset) => {
     const newTrack: Track = {
@@ -124,23 +155,23 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
             <SelectTrigger className="w-full sm:w-48 bg-secondary">
               <SelectValue placeholder="Roland Presets" />
             </SelectTrigger>
-            <SelectContent>
-              {ROLAND_303_PRESETS.map((preset) => (
-                <SelectItem key={preset.name} value={preset.name}>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">303</Badge>
-                    {preset.name}
+            <SelectContent className="max-h-[400px]">
+              {allPresets.map((preset, index) => {
+                const showDivider = index > 0 && preset.category !== allPresets[index - 1].category;
+                return (
+                  <div key={preset.name}>
+                    {showDivider && <div className="h-px bg-border my-1" />}
+                    <SelectItem value={preset.name}>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={getCategoryBadgeVariant(preset.category)} className="text-xs">
+                          {getCategoryLabel(preset.category)}
+                        </Badge>
+                        {preset.name}
+                      </div>
+                    </SelectItem>
                   </div>
-                </SelectItem>
-              ))}
-              {ROLAND_909_PRESETS.map((preset) => (
-                <SelectItem key={preset.name} value={preset.name}>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">909</Badge>
-                    {preset.name}
-                  </div>
-                </SelectItem>
-              ))}
+                );
+              })}
             </SelectContent>
           </Select>
           <div className="flex gap-2">
@@ -199,23 +230,23 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
                       <SelectTrigger className="flex-1 h-8 text-xs bg-background/50">
                         <SelectValue placeholder="Change preset..." />
                       </SelectTrigger>
-                      <SelectContent>
-                        {ROLAND_303_PRESETS.map((preset) => (
-                          <SelectItem key={preset.name} value={preset.name}>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs">303</Badge>
-                              {preset.name}
+                      <SelectContent className="max-h-[400px]">
+                        {allPresets.map((preset, index) => {
+                          const showDivider = index > 0 && preset.category !== allPresets[index - 1].category;
+                          return (
+                            <div key={preset.name}>
+                              {showDivider && <div className="h-px bg-border my-1" />}
+                              <SelectItem value={preset.name}>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant={getCategoryBadgeVariant(preset.category)} className="text-xs">
+                                    {getCategoryLabel(preset.category)}
+                                  </Badge>
+                                  {preset.name}
+                                </div>
+                              </SelectItem>
                             </div>
-                          </SelectItem>
-                        ))}
-                        {ROLAND_909_PRESETS.map((preset) => (
-                          <SelectItem key={preset.name} value={preset.name}>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs">909</Badge>
-                              {preset.name}
-                            </div>
-                          </SelectItem>
-                        ))}
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   </div>

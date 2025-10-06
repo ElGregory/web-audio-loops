@@ -13,7 +13,7 @@ export interface Track {
 export interface TrackPreset {
   name: string;
   params: AudioParams;
-  category: 'roland-303' | 'roland-909' | 'custom';
+  category: 'roland-303' | 'roland-808' | 'roland-909' | 'bass' | 'lead' | 'pad' | 'custom';
 }
 
 export const ROLAND_303_PRESETS: TrackPreset[] = [
@@ -60,6 +60,99 @@ export const ROLAND_303_PRESETS: TrackPreset[] = [
       release: 120,
       filterFreq: 400,
       filterQ: 12,
+    }
+  }
+];
+
+export const ROLAND_808_PRESETS: TrackPreset[] = [
+  {
+    name: '808 Kick',
+    category: 'roland-808',
+    params: {
+      frequency: 60,
+      waveform: 'sine',
+      volume: 1.0,
+      attack: 1,
+      decay: 400,
+      sustain: 0.1,
+      release: 600,
+      filterFreq: 150,
+      filterQ: 1,
+      isDrum: true,
+      noiseLevel: 0.15,
+      pitchDecay: 120,
+    }
+  },
+  {
+    name: '808 Snare',
+    category: 'roland-808',
+    params: {
+      frequency: 180,
+      waveform: 'triangle',
+      volume: 0.9,
+      attack: 1,
+      decay: 120,
+      sustain: 0.2,
+      release: 180,
+      filterFreq: 4000,
+      filterQ: 2,
+      isDrum: true,
+      noiseLevel: 0.8,
+      pitchDecay: 25,
+    }
+  },
+  {
+    name: '808 Clap',
+    category: 'roland-808',
+    params: {
+      frequency: 1000,
+      waveform: 'square',
+      volume: 0.85,
+      attack: 1,
+      decay: 80,
+      sustain: 0.15,
+      release: 120,
+      filterFreq: 3500,
+      filterQ: 2.5,
+      isDrum: true,
+      noiseLevel: 0.95,
+      pitchDecay: 15,
+    }
+  },
+  {
+    name: '808 Cowbell',
+    category: 'roland-808',
+    params: {
+      frequency: 540,
+      waveform: 'square',
+      volume: 0.8,
+      attack: 1,
+      decay: 200,
+      sustain: 0.3,
+      release: 300,
+      filterFreq: 2000,
+      filterQ: 4,
+      isDrum: true,
+      noiseLevel: 0.2,
+      pitchDecay: 30,
+    }
+  },
+  {
+    name: '808 Rim Shot',
+    category: 'roland-808',
+    params: {
+      frequency: 320,
+      waveform: 'triangle',
+      volume: 0.75,
+      attack: 1,
+      decay: 60,
+      sustain: 0.1,
+      release: 100,
+      filterFreq: 5000,
+      filterQ: 3,
+      isDrum: true,
+      noiseLevel: 0.5,
+      pitchDecay: 10,
     }
   }
 ];
@@ -207,6 +300,182 @@ export const ROLAND_909_PRESETS: TrackPreset[] = [
       isDrum: true,
       noiseLevel: 0.2,
       pitchDecay: 70,
+    }
+  }
+];
+
+export const BASS_PRESETS: TrackPreset[] = [
+  {
+    name: 'Reese Bass',
+    category: 'bass',
+    params: {
+      frequency: 55,
+      waveform: 'sawtooth',
+      volume: 0.9,
+      attack: 5,
+      decay: 300,
+      sustain: 0.8,
+      release: 400,
+      filterFreq: 600,
+      filterQ: 4,
+    }
+  },
+  {
+    name: 'Moog Bass',
+    category: 'bass',
+    params: {
+      frequency: 65,
+      waveform: 'sawtooth',
+      volume: 0.85,
+      attack: 3,
+      decay: 180,
+      sustain: 0.6,
+      release: 250,
+      filterFreq: 400,
+      filterQ: 6,
+    }
+  },
+  {
+    name: 'Sub Bass',
+    category: 'bass',
+    params: {
+      frequency: 40,
+      waveform: 'sine',
+      volume: 1.0,
+      attack: 5,
+      decay: 500,
+      sustain: 0.9,
+      release: 600,
+      filterFreq: 100,
+      filterQ: 1,
+    }
+  },
+  {
+    name: 'FM Bass',
+    category: 'bass',
+    params: {
+      frequency: 80,
+      waveform: 'square',
+      volume: 0.8,
+      attack: 1,
+      decay: 150,
+      sustain: 0.4,
+      release: 200,
+      filterFreq: 800,
+      filterQ: 5,
+    }
+  }
+];
+
+export const LEAD_PRESETS: TrackPreset[] = [
+  {
+    name: 'Saw Lead',
+    category: 'lead',
+    params: {
+      frequency: 440,
+      waveform: 'sawtooth',
+      volume: 0.7,
+      attack: 10,
+      decay: 100,
+      sustain: 0.7,
+      release: 200,
+      filterFreq: 2500,
+      filterQ: 4,
+    }
+  },
+  {
+    name: 'Square Lead',
+    category: 'lead',
+    params: {
+      frequency: 440,
+      waveform: 'square',
+      volume: 0.65,
+      attack: 8,
+      decay: 120,
+      sustain: 0.65,
+      release: 180,
+      filterFreq: 2000,
+      filterQ: 3,
+    }
+  },
+  {
+    name: 'Pluck Synth',
+    category: 'lead',
+    params: {
+      frequency: 880,
+      waveform: 'triangle',
+      volume: 0.75,
+      attack: 1,
+      decay: 80,
+      sustain: 0.3,
+      release: 100,
+      filterFreq: 3000,
+      filterQ: 6,
+    }
+  },
+  {
+    name: 'Rave Stab',
+    category: 'lead',
+    params: {
+      frequency: 220,
+      waveform: 'sawtooth',
+      volume: 0.85,
+      attack: 5,
+      decay: 150,
+      sustain: 0.5,
+      release: 250,
+      filterFreq: 1500,
+      filterQ: 8,
+    }
+  }
+];
+
+export const PAD_PRESETS: TrackPreset[] = [
+  {
+    name: 'Warm Pad',
+    category: 'pad',
+    params: {
+      frequency: 220,
+      waveform: 'sawtooth',
+      volume: 0.5,
+      attack: 200,
+      decay: 300,
+      sustain: 0.8,
+      release: 800,
+      filterFreq: 1200,
+      filterQ: 2,
+    }
+  },
+  {
+    name: 'String Pad',
+    category: 'pad',
+    params: {
+      frequency: 330,
+      waveform: 'sawtooth',
+      volume: 0.55,
+      attack: 250,
+      decay: 400,
+      sustain: 0.85,
+      release: 1000,
+      filterFreq: 1800,
+      filterQ: 2.5,
+    }
+  },
+  {
+    name: 'Noise Sweep',
+    category: 'pad',
+    params: {
+      frequency: 1000,
+      waveform: 'square',
+      volume: 0.6,
+      attack: 100,
+      decay: 500,
+      sustain: 0.6,
+      release: 600,
+      filterFreq: 500,
+      filterQ: 10,
+      isDrum: true,
+      noiseLevel: 0.7,
     }
   }
 ];
