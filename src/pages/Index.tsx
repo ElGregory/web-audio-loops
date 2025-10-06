@@ -613,103 +613,103 @@ const Index = () => {
     toast("Loaded improved acid techno sequence!");
   };
 
-  const loadClassicHipHop = () => {
-    const kickPreset = ROLAND_808_PRESETS.find(p => p.name === "808 Kick");
-    const snarePreset = ROLAND_808_PRESETS.find(p => p.name === "808 Snare");
-    const clapPreset = ROLAND_808_PRESETS.find(p => p.name === "808 Clap");
-    const rimPreset = ROLAND_808_PRESETS.find(p => p.name === "808 Rim Shot");
+  const loadJungleGabber = () => {
+    const kickPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Kick");
+    const snarePreset = ROLAND_909_PRESETS.find(p => p.name === "909 Snare");
+    const hihatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Hi-Hat");
+    const openHatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Open Hat");
     const reeseBassPreset = BASS_PRESETS.find(p => p.name === "Reese Bass");
-    const pluckPreset = LEAD_PRESETS.find(p => p.name === "Pluck Synth");
+    const raveStabPreset = LEAD_PRESETS.find(p => p.name === "Rave Stab");
     
     const newTracks: Track[] = [];
     
-    // 808 kick on classic hip-hop pattern
+    // Aggressive kick drum - Gabber style 4-on-the-floor with variations
     if (kickPreset) {
       const kickTrack: Track = {
         id: crypto.randomUUID(),
-        name: "808 Kick",
-        params: kickPreset.params,
+        name: "Hardcore Kick",
+        params: { ...kickPreset.params, volume: 1.0, filterFreq: 180, decay: 300 }, // Harder, punchier
         muted: false,
         solo: false,
         volume: 1.0,
-        steps: [true, false, false, false, false, false, true, false, false, true, false, false, true, false, false, false]
+        steps: [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, true]
       };
       newTracks.push(kickTrack);
     }
     
-    // 808 snare on 2 and 4
+    // Jungle breakbeat snare pattern - syncopated and fast
     if (snarePreset) {
       const snareTrack: Track = {
         id: crypto.randomUUID(),
-        name: "808 Snare",
-        params: snarePreset.params,
+        name: "Break Snare",
+        params: { ...snarePreset.params, volume: 1.0 },
         muted: false,
         solo: false,
-        volume: 0.9,
-        steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]
+        volume: 0.95,
+        steps: [false, false, false, true, false, true, false, false, true, false, false, true, false, false, true, false]
       };
       newTracks.push(snareTrack);
     }
     
-    // 808 clap for extra punch
-    if (clapPreset) {
-      const clapTrack: Track = {
+    // Fast hi-hat pattern for jungle energy
+    if (hihatPreset) {
+      const hihatTrack: Track = {
         id: crypto.randomUUID(),
-        name: "808 Clap",
-        params: clapPreset.params,
+        name: "Fast Hats",
+        params: hihatPreset.params,
         muted: false,
         solo: false,
-        volume: 0.7,
-        steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]
+        volume: 0.65,
+        steps: [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
       };
-      newTracks.push(clapTrack);
+      newTracks.push(hihatTrack);
     }
     
-    // 808 rim for texture
-    if (rimPreset) {
-      const rimTrack: Track = {
+    // Open hat accents for jungle flavor
+    if (openHatPreset) {
+      const openHatTrack: Track = {
         id: crypto.randomUUID(),
-        name: "Rim Shot",
-        params: rimPreset.params,
+        name: "Open Hat",
+        params: openHatPreset.params,
         muted: false,
         solo: false,
-        volume: 0.6,
-        steps: [false, false, true, false, false, false, false, true, false, false, true, false, false, false, false, true]
+        volume: 0.5,
+        steps: [false, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false]
       };
-      newTracks.push(rimTrack);
+      newTracks.push(openHatTrack);
     }
     
-    // Deep Reese bass
+    // Deep rolling Reese bass - jungle signature sound
     if (reeseBassPreset) {
       const bassTrack: Track = {
         id: crypto.randomUUID(),
         name: "Reese Bass",
-        params: { ...reeseBassPreset.params, frequency: 45 }, // Lower for hip-hop
+        params: { ...reeseBassPreset.params, frequency: 50, filterFreq: 500, filterQ: 6 }, // Deep and aggressive
         muted: false,
         solo: false,
-        volume: 0.85,
-        steps: [true, false, false, false, false, false, false, false, true, false, false, false, false, false, true, false]
+        volume: 0.9,
+        steps: [true, false, false, false, true, false, false, true, true, false, false, false, true, false, true, false]
       };
       newTracks.push(bassTrack);
     }
     
-    // Pluck synth for melody
-    if (pluckPreset) {
-      const pluckTrack: Track = {
+    // Rave stab for hardcore energy
+    if (raveStabPreset) {
+      const stabTrack: Track = {
         id: crypto.randomUUID(),
-        name: "Pluck",
-        params: { ...pluckPreset.params, frequency: 440 },
+        name: "Rave Stab",
+        params: { ...raveStabPreset.params, filterQ: 10, attack: 2 },
         muted: false,
         solo: false,
-        volume: 0.5,
-        steps: [false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, false]
+        volume: 0.7,
+        steps: [false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false]
       };
-      newTracks.push(pluckTrack);
+      newTracks.push(stabTrack);
     }
     
     setTracks(newTracks);
-    setBpm(90); // Classic hip-hop tempo
-    toast("Loaded classic hip-hop beat!");
+    setBpm(175); // Classic jungle/hardcore tempo
+    toast("Loaded jungle/gabber madness! 🔥");
   };
 
   const handleShareEmbed = async () => {
@@ -828,7 +828,7 @@ const Index = () => {
               onBpmChange={setBpm}
               onLoad909Kit={loadBasic909Kit}
               onLoadAcidTechno={loadAcidTechno}
-              onLoadClassicHipHop={loadClassicHipHop}
+              onLoadJungleGabber={loadJungleGabber}
               onReset={handleReset}
             >
               <Waveform
