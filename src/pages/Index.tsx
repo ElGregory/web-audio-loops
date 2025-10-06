@@ -618,93 +618,123 @@ const Index = () => {
     const snarePreset = ROLAND_909_PRESETS.find(p => p.name === "909 Snare");
     const hihatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Hi-Hat");
     const openHatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Open Hat");
+    const clapPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Clap");
     const reeseBassPreset = BASS_PRESETS.find(p => p.name === "Reese Bass");
-    const raveStabPreset = LEAD_PRESETS.find(p => p.name === "Rave Stab");
+    const subBassPreset = BASS_PRESETS.find(p => p.name === "Sub Bass");
+    const hooverPreset = LEAD_PRESETS.find(p => p.name === "Hoover");
     
     const newTracks: Track[] = [];
     
-    // Aggressive kick drum - Gabber style 4-on-the-floor with variations
+    // Amen break kick pattern - Jungle signature rhythm
     if (kickPreset) {
       const kickTrack: Track = {
         id: crypto.randomUUID(),
-        name: "Hardcore Kick",
-        params: { ...kickPreset.params, volume: 1.0, filterFreq: 180, decay: 300 }, // Harder, punchier
+        name: "Amen Kick",
+        params: { ...kickPreset.params, volume: 1.0, filterFreq: 150, decay: 250 },
         muted: false,
         solo: false,
         volume: 1.0,
-        steps: [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, true]
+        steps: [true, false, false, false, true, false, false, false, false, false, true, false, true, false, false, true]
       };
       newTracks.push(kickTrack);
     }
     
-    // Jungle breakbeat snare pattern - syncopated and fast
+    // Complex Amen-style snare pattern with ghost notes
     if (snarePreset) {
       const snareTrack: Track = {
         id: crypto.randomUUID(),
-        name: "Break Snare",
+        name: "Amen Snare",
         params: { ...snarePreset.params, volume: 1.0 },
         muted: false,
         solo: false,
-        volume: 0.95,
-        steps: [false, false, false, true, false, true, false, false, true, false, false, true, false, false, true, false]
+        volume: 0.9,
+        steps: [false, false, false, false, true, false, false, true, false, true, false, false, true, false, true, false]
       };
       newTracks.push(snareTrack);
     }
     
-    // Fast hi-hat pattern for jungle energy
+    // Snare layer for extra punch on key hits
+    if (clapPreset) {
+      const clapTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Clap Layer",
+        params: clapPreset.params,
+        muted: false,
+        solo: false,
+        volume: 0.7,
+        steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]
+      };
+      newTracks.push(clapTrack);
+    }
+    
+    // Rapid jungle hi-hats with some variation
     if (hihatPreset) {
       const hihatTrack: Track = {
         id: crypto.randomUUID(),
-        name: "Fast Hats",
+        name: "Jungle Hats",
         params: hihatPreset.params,
         muted: false,
         solo: false,
-        volume: 0.65,
-        steps: [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
+        volume: 0.6,
+        steps: [true, false, true, true, true, false, true, true, true, false, true, true, true, true, false, true]
       };
       newTracks.push(hihatTrack);
     }
     
-    // Open hat accents for jungle flavor
+    // Open hat for emphasis on breaks
     if (openHatPreset) {
       const openHatTrack: Track = {
         id: crypto.randomUUID(),
-        name: "Open Hat",
+        name: "Break Hat",
         params: openHatPreset.params,
         muted: false,
         solo: false,
-        volume: 0.5,
-        steps: [false, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false]
+        volume: 0.55,
+        steps: [false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false]
       };
       newTracks.push(openHatTrack);
     }
     
-    // Deep rolling Reese bass - jungle signature sound
+    // Wobbling Reese bass - jungle staple
     if (reeseBassPreset) {
-      const bassTrack: Track = {
+      const reeseBassTrack: Track = {
         id: crypto.randomUUID(),
         name: "Reese Bass",
-        params: { ...reeseBassPreset.params, frequency: 50, filterFreq: 500, filterQ: 6 }, // Deep and aggressive
+        params: { ...reeseBassPreset.params, frequency: 45, filterFreq: 600, filterQ: 8, decay: 400 },
         muted: false,
         solo: false,
-        volume: 0.9,
-        steps: [true, false, false, false, true, false, false, true, true, false, false, false, true, false, true, false]
+        volume: 0.85,
+        steps: [true, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false]
       };
-      newTracks.push(bassTrack);
+      newTracks.push(reeseBassTrack);
     }
     
-    // Rave stab for hardcore energy
-    if (raveStabPreset) {
-      const stabTrack: Track = {
+    // Sub bass for extra low end punch
+    if (subBassPreset) {
+      const subBassTrack: Track = {
         id: crypto.randomUUID(),
-        name: "Rave Stab",
-        params: { ...raveStabPreset.params, filterQ: 10, attack: 2 },
+        name: "Sub Kick",
+        params: { ...subBassPreset.params, frequency: 35, decay: 300 },
+        muted: false,
+        solo: false,
+        volume: 0.7,
+        steps: [true, false, false, false, true, false, false, false, false, false, true, false, true, false, false, true]
+      };
+      newTracks.push(subBassTrack);
+    }
+    
+    // Hoover stab for that classic rave energy
+    if (hooverPreset) {
+      const hooverTrack: Track = {
+        id: crypto.randomUUID(),
+        name: "Hoover Stab",
+        params: { ...hooverPreset.params, filterQ: 10, attack: 2 },
         muted: false,
         solo: false,
         volume: 0.7,
         steps: [false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false]
       };
-      newTracks.push(stabTrack);
+      newTracks.push(hooverTrack);
     }
     
     setTracks(newTracks);
