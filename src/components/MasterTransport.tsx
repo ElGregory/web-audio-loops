@@ -108,89 +108,89 @@ export const MasterTransport = ({
         {/* Quick Pattern Loaders & Reset */}
         <div className="flex flex-col gap-3">
           <h4 className="text-sm font-semibold text-primary">Quick Start Patterns</h4>
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2">`
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2">
             <Button 
               onClick={onLoad909Kit} 
               variant="outline" 
               size="sm"
-              className="h-auto py-3 text-sm bg-card/50 hover:bg-card border-brass text-brass hover:text-brass font-medium transition-all"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-brass text-brass hover:text-brass font-medium transition-all"
             >
-              <div className="flex flex-col items-center gap-1 w-full">
-                <span className="text-2xl">🥁</span>
-                <span className="text-xs font-semibold">909 Drum Kit</span>
-                <span className="text-[10px] opacity-75">Classic beats</span>
+              <span className="mr-2 text-lg">🥁</span>
+              <div className="flex flex-col">
+                <span>909 Drum Kit</span>
+                <span className="text-xs opacity-75">Classic beats</span>
               </div>
             </Button>
             <Button 
               onClick={onLoadAcidTechno} 
               variant="outline" 
               size="sm"
-              className="h-auto py-3 text-sm bg-card/50 hover:bg-card border-primary text-primary hover:text-primary font-medium transition-all"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-primary text-primary hover:text-primary font-medium transition-all"
             >
-              <div className="flex flex-col items-center gap-1 w-full">
-                <span className="text-2xl">🎵</span>
-                <span className="text-xs font-semibold">Acid Techno</span>
-                <span className="text-[10px] opacity-75">Electronic loops</span>
+              <span className="mr-2 text-lg">🎵</span>
+              <div className="flex flex-col">
+                <span>Acid Techno</span>
+                <span className="text-xs opacity-75">Electronic loops</span>
               </div>
             </Button>
             <Button 
               onClick={onLoadJungle} 
               variant="outline" 
               size="sm"
-              className="h-auto py-3 text-sm bg-card/50 hover:bg-card border-accent text-accent hover:text-accent font-medium transition-all"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-accent text-accent hover:text-accent font-medium transition-all"
             >
-              <div className="flex flex-col items-center gap-1 w-full">
-                <span className="text-2xl">⚡</span>
-                <span className="text-xs font-semibold">Jungle</span>
-                <span className="text-[10px] opacity-75">Fast breakbeats</span>
+              <span className="mr-2 text-lg">⚡</span>
+              <div className="flex flex-col">
+                <span>Jungle</span>
+                <span className="text-xs opacity-75">Fast breakbeats</span>
               </div>
             </Button>
             <Button 
               onClick={onLoadDubstep} 
               variant="outline" 
               size="sm"
-              className="h-auto py-3 text-sm bg-card/50 hover:bg-card border-purple-500 text-purple-400 hover:text-purple-300 font-medium transition-all"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-purple-500 text-purple-400 hover:text-purple-300 font-medium transition-all"
             >
-              <div className="flex flex-col items-center gap-1 w-full">
-                <span className="text-2xl">🔊</span>
-                <span className="text-xs font-semibold">Dubstep</span>
-                <span className="text-[10px] opacity-75">Wobble bass</span>
+              <span className="mr-2 text-lg">🔊</span>
+              <div className="flex flex-col">
+                <span>Dubstep</span>
+                <span className="text-xs opacity-75">Wobble bass</span>
               </div>
             </Button>
             <Button 
               onClick={onLoadTrance} 
               variant="outline" 
               size="sm"
-              className="h-auto py-3 text-sm bg-card/50 hover:bg-card border-cyan-500 text-cyan-400 hover:text-cyan-300 font-medium transition-all"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-cyan-500 text-cyan-400 hover:text-cyan-300 font-medium transition-all"
             >
-              <div className="flex flex-col items-center gap-1 w-full">
-                <span className="text-2xl">✨</span>
-                <span className="text-xs font-semibold">Trance</span>
-                <span className="text-[10px] opacity-75">Supersaw</span>
+              <span className="mr-2 text-lg">✨</span>
+              <div className="flex flex-col">
+                <span>Trance</span>
+                <span className="text-xs opacity-75">Supersaw</span>
               </div>
             </Button>
             <Button 
               onClick={onLoadTrap} 
               variant="outline" 
               size="sm"
-              className="h-auto py-3 text-sm bg-card/50 hover:bg-card border-orange-500 text-orange-400 hover:text-orange-300 font-medium transition-all"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-orange-500 text-orange-400 hover:text-orange-300 font-medium transition-all"
             >
-              <div className="flex flex-col items-center gap-1 w-full">
-                <span className="text-2xl">💥</span>
-                <span className="text-xs font-semibold">Trap</span>
-                <span className="text-[10px] opacity-75">808 bass</span>
+              <span className="mr-2 text-lg">💥</span>
+              <div className="flex flex-col">
+                <span>Trap</span>
+                <span className="text-xs opacity-75">808 bass</span>
               </div>
             </Button>
             <Button 
               onClick={onReset} 
               variant="outline" 
               size="sm"
-              className="h-auto py-3 text-sm bg-card/50 hover:bg-card border-destructive text-destructive hover:text-destructive font-medium transition-all"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-destructive text-destructive hover:text-destructive font-medium transition-all"
             >
-              <div className="flex flex-col items-center gap-1 w-full">
-                <span className="text-2xl">🔄</span>
-                <span className="text-xs font-semibold">Reset All</span>
-                <span className="text-[10px] opacity-75">Clear everything</span>
+              <span className="mr-2 text-lg">🔄</span>
+              <div className="flex flex-col">
+                <span>Reset All</span>
+                <span className="text-xs opacity-75">Clear everything</span>
               </div>
             </Button>
           </div>
