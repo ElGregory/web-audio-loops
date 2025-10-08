@@ -270,57 +270,33 @@ const Index = () => {
   }, [tracks, setTracks]);
 
   const handleLoad909Kit = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setAppState({ tracks: loadBasic909Kit(), bpm: 130 });
-      toast("Loaded 909 drum kit!");
-      setIsLoading(false);
-    }, 100);
+    setAppState({ tracks: loadBasic909Kit(), bpm: 130 });
+    toast("Loaded 909 drum kit!");
   }, [setAppState]);
 
   const handleLoadAcidTechno = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setAppState({ tracks: loadAcidTechno(), bpm: 135 });
-      toast("Loaded acid techno sequence!");
-      setIsLoading(false);
-    }, 100);
+    setAppState({ tracks: loadAcidTechno(), bpm: 135 });
+    toast("Loaded acid techno sequence!");
   }, [setAppState]);
 
   const handleLoadJungle = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setAppState({ tracks: loadJungle(), bpm: 170 });
-      toast("Loaded jungle sequence! 🔥");
-      setIsLoading(false);
-    }, 100);
+    setAppState({ tracks: loadJungle(), bpm: 170 });
+    toast("Loaded jungle sequence! 🔥");
   }, [setAppState]);
 
   const handleLoadDubstep = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setAppState({ tracks: loadDubstep(), bpm: 140 });
-      toast("Loaded dubstep sequence!");
-      setIsLoading(false);
-    }, 100);
+    setAppState({ tracks: loadDubstep(), bpm: 140 });
+    toast("Loaded dubstep sequence!");
   }, [setAppState]);
 
   const handleLoadTrance = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setAppState({ tracks: loadTrance(), bpm: 138 });
-      toast("Loaded trance sequence!");
-      setIsLoading(false);
-    }, 100);
+    setAppState({ tracks: loadTrance(), bpm: 138 });
+    toast("Loaded trance sequence!");
   }, [setAppState]);
 
   const handleLoadTrap = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setAppState({ tracks: loadTrap(), bpm: 140 });
-      toast("Loaded trap sequence!");
-      setIsLoading(false);
-    }, 100);
+    setAppState({ tracks: loadTrap(), bpm: 140 });
+    toast("Loaded trap sequence!");
   }, [setAppState]);
 
   const handleShareEmbed = async () => {
