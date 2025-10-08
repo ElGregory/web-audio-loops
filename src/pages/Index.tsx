@@ -272,31 +272,29 @@ const Index = () => {
   const handleLoad909Kit = useCallback(() => {
     setIsLoading(true);
     setTimeout(() => {
-      setTracks(loadBasic909Kit());
+      setAppState({ tracks: loadBasic909Kit(), bpm: 130 });
       toast("Loaded 909 drum kit!");
       setIsLoading(false);
     }, 100);
-  }, [setTracks]);
+  }, [setAppState]);
 
   const handleLoadAcidTechno = useCallback(() => {
     setIsLoading(true);
     setTimeout(() => {
-      setTracks(loadAcidTechno());
-      setBpm(135);
+      setAppState({ tracks: loadAcidTechno(), bpm: 135 });
       toast("Loaded acid techno sequence!");
       setIsLoading(false);
     }, 100);
-  }, [setTracks, setBpm]);
+  }, [setAppState]);
 
   const handleLoadJungle = useCallback(() => {
     setIsLoading(true);
     setTimeout(() => {
-      setTracks(loadJungle());
-      setBpm(170);
+      setAppState({ tracks: loadJungle(), bpm: 170 });
       toast("Loaded jungle sequence! 🔥");
       setIsLoading(false);
     }, 100);
-  }, [setTracks, setBpm]);
+  }, [setAppState]);
 
   const handleShareEmbed = async () => {
     if (tracks.length === 0) {
