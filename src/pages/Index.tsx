@@ -486,10 +486,9 @@ const Index = () => {
               onLoad909Kit={handleLoad909Kit}
               onLoadAcidTechno={handleLoadAcidTechno}
               onLoadJungle={handleLoadJungle}
-              onLoadDubstep={handleLoadDubstep}
-              onLoadTrance={handleLoadTrance}
-              onLoadTrap={handleLoadTrap}
-              onReset={handleReset}
+        onLoadDubstep={handleLoadDubstep}
+        onLoadTrance={handleLoadTrance}
+        onLoadTrap={handleLoadTrap}
             >
               <Waveform
                 audioContext={audioContext}

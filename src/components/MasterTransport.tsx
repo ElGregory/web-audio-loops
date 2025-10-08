@@ -24,7 +24,6 @@ interface MasterTransportProps {
   onLoadDubstep: () => void;
   onLoadTrance: () => void;
   onLoadTrap: () => void;
-  onReset: () => void;
   children?: React.ReactNode;
   className?: string;
 }
@@ -42,7 +41,6 @@ export const MasterTransport = ({
   onLoadDubstep,
   onLoadTrance,
   onLoadTrap,
-  onReset,
   children,
   className
 }: MasterTransportProps) => {
@@ -105,10 +103,10 @@ export const MasterTransport = ({
           </div>
         </div>
 
-        {/* Quick Pattern Loaders & Reset */}
+        {/* Quick Pattern Loaders */}
         <div className="flex flex-col gap-3">
           <h4 className="text-sm font-semibold text-primary">Quick Start Patterns</h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             <Button 
               onClick={onLoad909Kit} 
               variant="outline" 
@@ -179,18 +177,6 @@ export const MasterTransport = ({
               <div className="flex flex-col">
                 <span>Trap</span>
                 <span className="text-xs opacity-75">808 bass</span>
-              </div>
-            </Button>
-            <Button 
-              onClick={onReset} 
-              variant="outline" 
-              size="sm"
-              className="h-12 text-sm bg-card/50 hover:bg-card border-destructive text-destructive hover:text-destructive font-medium transition-all"
-            >
-              <span className="mr-2 text-lg">🔄</span>
-              <div className="flex flex-col">
-                <span>Reset All</span>
-                <span className="text-xs opacity-75">Clear everything</span>
               </div>
             </Button>
           </div>
