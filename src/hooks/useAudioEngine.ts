@@ -15,7 +15,7 @@ export interface AudioParams {
   pitchDecay?: number;
 }
 
-const DEBUG_DIRECT_MONITOR = true;
+const DEBUG_DIRECT_MONITOR = false;
 
 export const useAudioEngine = () => {
   console.log('useAudioEngine: Hook called');
@@ -30,20 +30,34 @@ export const useAudioEngine = () => {
   const wetGainRef = useRef<GainNode>();
 
   const initializeAudio = useCallback(async () => {
-    if (audioContext && audioContext.state !== 'closed') return;
+    if (audioContext && audioContext.state !== 'closed') {
+      // Safari: Always try to resume if suspended
+      if (audioContext.state === 'suspended') {
+        try {
+          await audioContext.resume();
+          console.log('[AudioEngine] Resumed existing AudioContext for Safari');
+        } catch (e) {
+          console.warn('[AudioEngine] Failed to resume existing context', e);
+        }
+      }
+      return;
+    }
 
     try {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       
-      // Ensure context is running (some browsers create it suspended)
-      try {
-        if (ctx.state === 'suspended') {
+      // Safari: Context starts suspended and requires user gesture to resume
+      // We'll try to resume immediately, but it may fail without user interaction
+      if (ctx.state === 'suspended') {
+        try {
           await ctx.resume();
+          console.log('[AudioEngine] Successfully resumed AudioContext on init');
+        } catch (e) {
+          console.log('[AudioEngine] Context suspended - will resume on first user interaction');
         }
-        console.log('[AudioEngine] Initialized AudioContext state:', ctx.state);
-      } catch (e) {
-        console.warn('[AudioEngine] Failed to resume AudioContext on init', e);
       }
+      
+      console.log('[AudioEngine] Initialized AudioContext state:', ctx.state);
       
       // Create audio nodes
       const analyser = ctx.createAnalyser();
@@ -110,7 +124,7 @@ export const useAudioEngine = () => {
     return noiseBuffer;
   }, [audioContext]);
 
-  const playTone = useCallback((params: AudioParams, duration: number = 0.5) => {
+  const playTone = useCallback(async (params: AudioParams, duration: number = 0.5) => {
     if (!audioContext || !masterGainRef.current) {
       console.error('[AudioEngine] Missing audioContext or masterGain:', { 
         hasContext: !!audioContext, 
@@ -119,18 +133,22 @@ export const useAudioEngine = () => {
       return;
     }
 
-    // Ensure context is running before playing (safety on some browsers)
+    // Safari critical: Ensure context is running before playing
     if (audioContext.state === 'closed') {
       console.warn('[AudioEngine] Context is closed; re-initialization required');
       return;
     }
+    
+    // Safari: MUST await resume before playing any sound
     if (audioContext.state === 'suspended') {
-      console.warn('[AudioEngine] Context suspended, attempting to resume...');
-      audioContext.resume().then(() => {
-        console.log('[AudioEngine] Context resumed successfully');
-      }).catch((e) => {
-        console.error('[AudioEngine] Resume failed inside playTone:', e);
-      });
+      console.log('[AudioEngine] Context suspended, resuming now (Safari fix)...');
+      try {
+        await audioContext.resume();
+        console.log('[AudioEngine] Context resumed successfully, state:', audioContext.state);
+      } catch (e) {
+        console.error('[AudioEngine] Failed to resume context:', e);
+        return; // Don't try to play if resume failed
+      }
     }
 
     console.log('[AudioEngine] PlayTone called with state:', audioContext.state);
