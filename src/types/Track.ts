@@ -13,7 +13,7 @@ export interface Track {
 export interface TrackPreset {
   name: string;
   params: AudioParams;
-  category: 'roland-303' | 'roland-808' | 'roland-909' | 'bass' | 'lead' | 'pad' | 'custom';
+  category: 'roland-303' | 'roland-808' | 'roland-909' | 'bass' | 'lead' | 'pad' | 'percussion' | 'fx' | 'synth-classic' | 'dubstep' | 'trance' | 'trap' | 'custom';
 }
 
 export const ROLAND_303_PRESETS: TrackPreset[] = [
@@ -476,6 +476,355 @@ export const PAD_PRESETS: TrackPreset[] = [
       filterQ: 10,
       isDrum: true,
       noiseLevel: 0.7,
+    }
+  }
+];
+
+export const PERCUSSION_PRESETS: TrackPreset[] = [
+  {
+    name: 'Tom Low',
+    category: 'percussion',
+    params: {
+      frequency: 120,
+      waveform: 'sine',
+      volume: 0.85,
+      attack: 1,
+      decay: 180,
+      sustain: 0.2,
+      release: 220,
+      filterFreq: 250,
+      filterQ: 2,
+      isDrum: true,
+      noiseLevel: 0.15,
+      pitchDecay: 60,
+    }
+  },
+  {
+    name: 'Tom Mid',
+    category: 'percussion',
+    params: {
+      frequency: 220,
+      waveform: 'sine',
+      volume: 0.8,
+      attack: 1,
+      decay: 150,
+      sustain: 0.15,
+      release: 180,
+      filterFreq: 400,
+      filterQ: 2.5,
+      isDrum: true,
+      noiseLevel: 0.2,
+      pitchDecay: 50,
+    }
+  },
+  {
+    name: 'Crash Cymbal',
+    category: 'percussion',
+    params: {
+      frequency: 10000,
+      waveform: 'square',
+      volume: 0.75,
+      attack: 1,
+      decay: 400,
+      sustain: 0.3,
+      release: 800,
+      filterFreq: 12000,
+      filterQ: 1.5,
+      isDrum: true,
+      noiseLevel: 0.95,
+      pitchDecay: 5,
+    }
+  },
+  {
+    name: 'Ride Cymbal',
+    category: 'percussion',
+    params: {
+      frequency: 7000,
+      waveform: 'square',
+      volume: 0.7,
+      attack: 1,
+      decay: 300,
+      sustain: 0.25,
+      release: 600,
+      filterFreq: 8000,
+      filterQ: 2,
+      isDrum: true,
+      noiseLevel: 0.85,
+      pitchDecay: 8,
+    }
+  }
+];
+
+export const FX_PRESETS: TrackPreset[] = [
+  {
+    name: 'Riser',
+    category: 'fx',
+    params: {
+      frequency: 100,
+      waveform: 'sawtooth',
+      volume: 0.6,
+      attack: 800,
+      decay: 200,
+      sustain: 0.7,
+      release: 300,
+      filterFreq: 200,
+      filterQ: 8,
+      isDrum: true,
+      noiseLevel: 0.4,
+    }
+  },
+  {
+    name: 'Impact',
+    category: 'fx',
+    params: {
+      frequency: 80,
+      waveform: 'sine',
+      volume: 1.0,
+      attack: 1,
+      decay: 100,
+      sustain: 0.1,
+      release: 150,
+      filterFreq: 150,
+      filterQ: 1,
+      isDrum: true,
+      noiseLevel: 0.6,
+      pitchDecay: 80,
+    }
+  },
+  {
+    name: 'Laser Zap',
+    category: 'fx',
+    params: {
+      frequency: 2000,
+      waveform: 'square',
+      volume: 0.7,
+      attack: 1,
+      decay: 150,
+      sustain: 0.2,
+      release: 200,
+      filterFreq: 3000,
+      filterQ: 15,
+      isDrum: true,
+      pitchDecay: 200,
+    }
+  },
+  {
+    name: 'White Noise Sweep',
+    category: 'fx',
+    params: {
+      frequency: 4000,
+      waveform: 'square',
+      volume: 0.65,
+      attack: 50,
+      decay: 400,
+      sustain: 0.5,
+      release: 500,
+      filterFreq: 1000,
+      filterQ: 12,
+      isDrum: true,
+      noiseLevel: 0.95,
+    }
+  }
+];
+
+export const SYNTH_CLASSIC_PRESETS: TrackPreset[] = [
+  {
+    name: 'Moog Lead',
+    category: 'synth-classic',
+    params: {
+      frequency: 440,
+      waveform: 'sawtooth',
+      volume: 0.75,
+      attack: 8,
+      decay: 150,
+      sustain: 0.65,
+      release: 250,
+      filterFreq: 1800,
+      filterQ: 5,
+    }
+  },
+  {
+    name: 'Juno Strings',
+    category: 'synth-classic',
+    params: {
+      frequency: 330,
+      waveform: 'sawtooth',
+      volume: 0.6,
+      attack: 180,
+      decay: 300,
+      sustain: 0.75,
+      release: 900,
+      filterFreq: 2200,
+      filterQ: 2,
+    }
+  },
+  {
+    name: 'TB-303 Variation',
+    category: 'synth-classic',
+    params: {
+      frequency: 65,
+      waveform: 'sawtooth',
+      volume: 0.8,
+      attack: 2,
+      decay: 120,
+      sustain: 0.35,
+      release: 180,
+      filterFreq: 600,
+      filterQ: 10,
+    }
+  }
+];
+
+export const DUBSTEP_PRESETS: TrackPreset[] = [
+  {
+    name: 'Wobble Bass',
+    category: 'dubstep',
+    params: {
+      frequency: 55,
+      waveform: 'sawtooth',
+      volume: 0.9,
+      attack: 5,
+      decay: 200,
+      sustain: 0.7,
+      release: 300,
+      filterFreq: 400,
+      filterQ: 15,
+    }
+  },
+  {
+    name: 'Growl Bass',
+    category: 'dubstep',
+    params: {
+      frequency: 65,
+      waveform: 'square',
+      volume: 0.85,
+      attack: 3,
+      decay: 180,
+      sustain: 0.6,
+      release: 250,
+      filterFreq: 350,
+      filterQ: 18,
+    }
+  },
+  {
+    name: 'Sub Drop',
+    category: 'dubstep',
+    params: {
+      frequency: 50,
+      waveform: 'sine',
+      volume: 1.0,
+      attack: 1,
+      decay: 600,
+      sustain: 0.2,
+      release: 800,
+      filterFreq: 100,
+      filterQ: 1,
+      isDrum: true,
+      pitchDecay: 150,
+    }
+  }
+];
+
+export const TRANCE_PRESETS: TrackPreset[] = [
+  {
+    name: 'Supersaw Lead',
+    category: 'trance',
+    params: {
+      frequency: 440,
+      waveform: 'sawtooth',
+      volume: 0.7,
+      attack: 15,
+      decay: 120,
+      sustain: 0.75,
+      release: 200,
+      filterFreq: 3500,
+      filterQ: 3,
+    }
+  },
+  {
+    name: 'Pluck Arp',
+    category: 'trance',
+    params: {
+      frequency: 880,
+      waveform: 'triangle',
+      volume: 0.75,
+      attack: 1,
+      decay: 60,
+      sustain: 0.2,
+      release: 80,
+      filterFreq: 4000,
+      filterQ: 7,
+    }
+  },
+  {
+    name: 'Trance Gate',
+    category: 'trance',
+    params: {
+      frequency: 220,
+      waveform: 'sawtooth',
+      volume: 0.65,
+      attack: 1,
+      decay: 50,
+      sustain: 0.8,
+      release: 80,
+      filterFreq: 2000,
+      filterQ: 4,
+    }
+  }
+];
+
+export const TRAP_PRESETS: TrackPreset[] = [
+  {
+    name: '808 Sub Bass',
+    category: 'trap',
+    params: {
+      frequency: 45,
+      waveform: 'sine',
+      volume: 1.0,
+      attack: 1,
+      decay: 500,
+      sustain: 0.6,
+      release: 700,
+      filterFreq: 100,
+      filterQ: 1,
+      isDrum: true,
+      pitchDecay: 90,
+    }
+  },
+  {
+    name: 'Snare Roll',
+    category: 'trap',
+    params: {
+      frequency: 200,
+      waveform: 'triangle',
+      volume: 0.85,
+      attack: 1,
+      decay: 80,
+      sustain: 0.15,
+      release: 120,
+      filterFreq: 3500,
+      filterQ: 2.5,
+      isDrum: true,
+      noiseLevel: 0.75,
+      pitchDecay: 15,
+    }
+  },
+  {
+    name: 'Hi-Hat Roll',
+    category: 'trap',
+    params: {
+      frequency: 9000,
+      waveform: 'square',
+      volume: 0.7,
+      attack: 1,
+      decay: 30,
+      sustain: 0.05,
+      release: 50,
+      filterFreq: 13000,
+      filterQ: 3,
+      isDrum: true,
+      noiseLevel: 0.9,
+      pitchDecay: 5,
     }
   }
 ];

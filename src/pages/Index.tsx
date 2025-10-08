@@ -16,7 +16,7 @@ import {
   encodeSequenceToEmbedUrl, 
   decodeSequenceFromUrl 
 } from "@/lib/sequenceEncoder";
-import { loadBasic909Kit, loadAcidTechno, loadJungle } from "@/lib/presetLoader";
+import { loadBasic909Kit, loadAcidTechno, loadJungle, loadDubstep, loadTrance, loadTrap } from "@/lib/presetLoader";
 
 interface AppState {
   tracks: Track[];
@@ -296,6 +296,33 @@ const Index = () => {
     }, 100);
   }, [setAppState]);
 
+  const handleLoadDubstep = useCallback(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setAppState({ tracks: loadDubstep(), bpm: 140 });
+      toast("Loaded dubstep sequence!");
+      setIsLoading(false);
+    }, 100);
+  }, [setAppState]);
+
+  const handleLoadTrance = useCallback(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setAppState({ tracks: loadTrance(), bpm: 138 });
+      toast("Loaded trance sequence!");
+      setIsLoading(false);
+    }, 100);
+  }, [setAppState]);
+
+  const handleLoadTrap = useCallback(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setAppState({ tracks: loadTrap(), bpm: 140 });
+      toast("Loaded trap sequence!");
+      setIsLoading(false);
+    }, 100);
+  }, [setAppState]);
+
   const handleShareEmbed = async () => {
     if (tracks.length === 0) {
       toast("Create some tracks first!");
@@ -459,6 +486,9 @@ const Index = () => {
               onLoad909Kit={handleLoad909Kit}
               onLoadAcidTechno={handleLoadAcidTechno}
               onLoadJungle={handleLoadJungle}
+              onLoadDubstep={handleLoadDubstep}
+              onLoadTrance={handleLoadTrance}
+              onLoadTrap={handleLoadTrap}
               onReset={handleReset}
             >
               <Waveform

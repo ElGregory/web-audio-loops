@@ -21,6 +21,9 @@ interface MasterTransportProps {
   onLoad909Kit: () => void;
   onLoadAcidTechno: () => void;
   onLoadJungle: () => void;
+  onLoadDubstep: () => void;
+  onLoadTrance: () => void;
+  onLoadTrap: () => void;
   onReset: () => void;
   children?: React.ReactNode;
   className?: string;
@@ -36,6 +39,9 @@ export const MasterTransport = ({
   onLoad909Kit,
   onLoadAcidTechno,
   onLoadJungle,
+  onLoadDubstep,
+  onLoadTrance,
+  onLoadTrap,
   onReset,
   children,
   className
@@ -102,7 +108,7 @@ export const MasterTransport = ({
         {/* Quick Pattern Loaders & Reset */}
         <div className="flex flex-col gap-3">
           <h4 className="text-sm font-semibold text-primary">Quick Start Patterns</h4>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2">
             <Button 
               onClick={onLoad909Kit} 
               variant="outline" 
@@ -137,6 +143,42 @@ export const MasterTransport = ({
               <div className="flex flex-col">
                 <span>Jungle</span>
                 <span className="text-xs opacity-75">Fast breakbeats</span>
+              </div>
+            </Button>
+            <Button 
+              onClick={onLoadDubstep} 
+              variant="outline" 
+              size="sm"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-purple-500 text-purple-400 hover:text-purple-300 font-medium transition-all"
+            >
+              <span className="mr-2 text-lg">🔊</span>
+              <div className="flex flex-col">
+                <span>Dubstep</span>
+                <span className="text-xs opacity-75">Wobble bass</span>
+              </div>
+            </Button>
+            <Button 
+              onClick={onLoadTrance} 
+              variant="outline" 
+              size="sm"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-cyan-500 text-cyan-400 hover:text-cyan-300 font-medium transition-all"
+            >
+              <span className="mr-2 text-lg">✨</span>
+              <div className="flex flex-col">
+                <span>Trance</span>
+                <span className="text-xs opacity-75">Supersaw</span>
+              </div>
+            </Button>
+            <Button 
+              onClick={onLoadTrap} 
+              variant="outline" 
+              size="sm"
+              className="h-12 text-sm bg-card/50 hover:bg-card border-orange-500 text-orange-400 hover:text-orange-300 font-medium transition-all"
+            >
+              <span className="mr-2 text-lg">💥</span>
+              <div className="flex flex-col">
+                <span>Trap</span>
+                <span className="text-xs opacity-75">808 bass</span>
               </div>
             </Button>
             <Button 
