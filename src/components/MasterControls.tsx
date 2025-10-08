@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,7 +19,6 @@ interface MasterControlsProps {
 }
 
 export const MasterControls = ({ settings, onSettingsChange, className }: MasterControlsProps) => {
-  console.log('MasterControls: Component rendered');
   const updateSetting = <K extends keyof MasterSettings>(key: K, value: MasterSettings[K]) => {
     onSettingsChange({ ...settings, [key]: value });
   };

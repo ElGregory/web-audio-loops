@@ -11,7 +11,7 @@ import { Soundboard } from "@/components/Soundboard";
 import { Track } from "@/types/Track";
 import { Button } from "@/components/ui/button";
 import { HelpDialog } from "@/components/HelpDialog";
-import { Zap, Settings, Share, Undo, Redo } from "lucide-react";
+import { Zap, Settings, Share, Undo2, Redo2 } from "lucide-react";
 import { toast } from "sonner";
 import { 
   encodeSequenceToEmbedUrl, 
@@ -366,7 +366,7 @@ const Index = () => {
                     aria-label="Undo last action"
                     title="Undo (Ctrl+Z)"
                   >
-                    <Undo className="w-4 h-4" />
+                    <Undo2 className="w-4 h-4" />
                   </Button>
                   <Button 
                     variant="ghost" 
@@ -377,7 +377,7 @@ const Index = () => {
                     aria-label="Redo last action"
                     title="Redo (Ctrl+Shift+Z)"
                   >
-                    <Redo className="w-4 h-4" />
+                    <Redo2 className="w-4 h-4" />
                   </Button>
                   <Button 
                     variant="outline" 
