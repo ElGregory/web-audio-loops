@@ -18,10 +18,13 @@ A browser-based music creation tool for crafting electronic music loops. Stream 
 - **Real-time Waveform Display**: Visual feedback of your audio output
 
 ### 🎵 Presets & Workflow
-- **Genre Presets**: Pre-configured setups for House, Techno, Acid Techno, and Drum & Bass
+- **Extensive Preset Library**: Pre-configured setups for multiple genres including Acid Techno, Jungle, Dubstep, Trance, and Trap
+- **Roland-Inspired Sounds**: Authentic 303, 808, 909 emulations with categorized presets (Drums, Bass, Synths, FX)
 - **Custom Presets**: Save your own creations to local storage
 - **Soundboard**: Quick access to your saved presets
 - **Instant Sharing**: Generate shareable links to your compositions
+- **Undo/Redo**: Full history tracking for all your edits
+- **Keyboard Shortcuts**: Spacebar to play/pause, Ctrl+Z/Y for undo/redo, Ctrl+Arrow for BPM control
 
 ### 🎛️ Synthesis Controls
 - **ADSR Envelope**: Attack, Decay, Sustain, Release parameters
@@ -78,12 +81,14 @@ The built files will be in the `dist` directory.
 
 ## Usage
 
-1. **Select a Preset**: Choose from House, Techno, Acid Techno, or Drum & Bass to get started quickly
+1. **Select a Preset**: Choose from multiple genres (Acid Techno, Jungle, Dubstep, Trance, Trap) or start with a Basic 909 Kit
 2. **Edit Tracks**: Click on individual steps in the sequencer to create your pattern
-3. **Adjust Sounds**: Use the synth controls to modify waveforms, envelopes, and filters
-4. **Mix**: Balance your tracks using the mixer controls
-5. **Save**: Store your custom presets to the soundboard for quick recall
-6. **Share**: Generate a shareable link to send your creation to others
+3. **Choose Sounds**: Select from categorized Roland-inspired presets (Drums, Bass, Synths, Percussion, FX)
+4. **Adjust Sounds**: Use the synth controls to modify waveforms, envelopes, and filters
+5. **Mix**: Balance your tracks using the mixer controls (volume, pan, solo, mute)
+6. **Use Shortcuts**: Spacebar for play/pause, Ctrl+Z for undo, Ctrl+Arrow keys for BPM
+7. **Save**: Store your custom presets to the soundboard for quick recall
+8. **Share**: Generate a shareable link to send your creation to others
 
 ## License
 
