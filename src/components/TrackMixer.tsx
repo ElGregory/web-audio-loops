@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Track, TrackPreset, ROLAND_303_PRESETS, ROLAND_808_PRESETS, ROLAND_909_PRESETS, BASS_PRESETS, LEAD_PRESETS, PAD_PRESETS } from '@/types/Track';
+import { Track, TrackPreset, ROLAND_303_PRESETS, ROLAND_808_PRESETS, ROLAND_909_PRESETS, BASS_PRESETS, LEAD_PRESETS, PAD_PRESETS, PERCUSSION_PRESETS, FX_PRESETS, SYNTH_CLASSIC_PRESETS, DUBSTEP_PRESETS, TRANCE_PRESETS, TRAP_PRESETS } from '@/types/Track';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -30,7 +30,13 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
     ...ROLAND_909_PRESETS, 
     ...BASS_PRESETS, 
     ...LEAD_PRESETS, 
-    ...PAD_PRESETS
+    ...PAD_PRESETS,
+    ...PERCUSSION_PRESETS,
+    ...FX_PRESETS,
+    ...SYNTH_CLASSIC_PRESETS,
+    ...DUBSTEP_PRESETS,
+    ...TRANCE_PRESETS,
+    ...TRAP_PRESETS
   ];
 
   const getCategoryBadgeVariant = (category: string) => {
@@ -41,6 +47,12 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
       case 'bass': return 'default';
       case 'lead': return 'secondary';
       case 'pad': return 'outline';
+      case 'percussion': return 'default';
+      case 'fx': return 'secondary';
+      case 'synth-classic': return 'outline';
+      case 'dubstep': return 'default';
+      case 'trance': return 'secondary';
+      case 'trap': return 'outline';
       default: return 'outline';
     }
   };
@@ -53,6 +65,12 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
       case 'bass': return 'BASS';
       case 'lead': return 'LEAD';
       case 'pad': return 'PAD';
+      case 'percussion': return 'PERC';
+      case 'fx': return 'FX';
+      case 'synth-classic': return 'CLASSIC';
+      case 'dubstep': return 'DUBSTEP';
+      case 'trance': return 'TRANCE';
+      case 'trap': return 'TRAP';
       default: return category.toUpperCase();
     }
   };
