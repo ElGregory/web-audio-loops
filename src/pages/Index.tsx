@@ -10,6 +10,7 @@ import { MasterTransport } from "@/components/MasterTransport";
 import { Soundboard } from "@/components/Soundboard";
 import { Track } from "@/types/Track";
 import { Button } from "@/components/ui/button";
+import { HelpDialog } from "@/components/HelpDialog";
 import { Zap, Settings, Share, Undo, Redo } from "lucide-react";
 import { toast } from "sonner";
 import { 
@@ -398,6 +399,7 @@ const Index = () => {
                     <Share className="w-4 h-4 mr-1 md:mr-2" aria-hidden="true" />
                     <span className="hidden sm:inline">Share</span>
                   </Button>
+                  <HelpDialog />
                 </>
               )}
             </div>
