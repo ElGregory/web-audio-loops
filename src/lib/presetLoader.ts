@@ -151,124 +151,90 @@ export const loadJungle = (): Track[] => {
   const openHatPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Open Hat");
   const clapPreset = ROLAND_909_PRESETS.find(p => p.name === "909 Clap");
   const subBassPreset = BASS_PRESETS.find(p => p.name === "Sub Bass");
-  const reeseBassPreset = BASS_PRESETS.find(p => p.name === "Reese Bass");
   const hooverPreset = LEAD_PRESETS.find(p => p.name === "Hoover");
   
   const newTracks: Track[] = [];
   
-  // Authentic Amen kick pattern - syncopated
   if (kickPreset) {
     newTracks.push({
       id: crypto.randomUUID(),
       name: "Amen Kick",
-      params: { ...kickPreset.params, volume: 1.1, filterFreq: 120, decay: 280, attack: 1 },
+      params: { ...kickPreset.params, volume: 1.0, filterFreq: 150, decay: 250 },
       muted: false,
       solo: false,
       volume: 1.0,
-      steps: [true, false, false, false, false, false, true, false, false, false, true, false, true, false, false, true]
+      steps: [true, false, false, false, true, false, false, false, false, false, true, false, true, false, false, true]
     });
   }
   
-  // Main snare with ghost notes
   if (snarePreset) {
     newTracks.push({
       id: crypto.randomUUID(),
       name: "Amen Snare",
-      params: { ...snarePreset.params, volume: 1.1, filterFreq: 2500, filterQ: 3 },
+      params: { ...snarePreset.params, volume: 1.0 },
       muted: false,
       solo: false,
-      volume: 0.95,
+      volume: 0.9,
       steps: [false, false, false, false, true, false, false, true, false, true, false, false, true, false, true, false]
     });
   }
   
-  // Ghost snares for rolls
-  if (snarePreset) {
-    newTracks.push({
-      id: crypto.randomUUID(),
-      name: "Ghost Snares",
-      params: { ...snarePreset.params, volume: 0.4, filterFreq: 3000, decay: 80 },
-      muted: false,
-      solo: false,
-      volume: 0.45,
-      steps: [false, false, true, false, false, true, false, false, false, false, true, false, false, true, false, true]
-    });
-  }
-  
-  // Clap layer for punch
   if (clapPreset) {
     newTracks.push({
       id: crypto.randomUUID(),
       name: "Clap Layer",
-      params: { ...clapPreset.params, volume: 0.8, filterFreq: 2000 },
+      params: clapPreset.params,
       muted: false,
       solo: false,
-      volume: 0.65,
+      volume: 0.7,
       steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]
     });
   }
   
-  // Complex hi-hat pattern with variations
   if (hihatPreset) {
     newTracks.push({
       id: crypto.randomUUID(),
       name: "Jungle Hats",
-      params: { ...hihatPreset.params, volume: 0.7, filterFreq: 9000, decay: 60 },
+      params: hihatPreset.params,
       muted: false,
       solo: false,
-      volume: 0.55,
-      steps: [true, false, true, true, true, false, true, true, true, true, false, true, true, false, true, true]
+      volume: 0.6,
+      steps: [true, false, true, true, true, false, true, true, true, false, true, true, true, true, false, true]
     });
   }
   
-  // Open hats for accents
   if (openHatPreset) {
     newTracks.push({
       id: crypto.randomUUID(),
-      name: "Open Hats",
-      params: { ...openHatPreset.params, volume: 0.8, filterFreq: 8000, decay: 180 },
+      name: "Break Hat",
+      params: openHatPreset.params,
       muted: false,
       solo: false,
-      volume: 0.5,
-      steps: [false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, true]
+      volume: 0.55,
+      steps: [false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false]
     });
   }
   
-  // Sub bass following kick pattern
   if (subBassPreset) {
     newTracks.push({
       id: crypto.randomUUID(),
-      name: "Sub Bass",
-      params: { ...subBassPreset.params, frequency: 38, decay: 350, attack: 2, filterFreq: 100 },
-      muted: false,
-      solo: false,
-      volume: 0.75,
-      steps: [true, false, false, false, false, false, true, false, false, false, true, false, true, false, false, true]
-    });
-  }
-  
-  // Reese bassline with movement
-  if (reeseBassPreset) {
-    newTracks.push({
-      id: crypto.randomUUID(),
-      name: "Reese Bass",
-      params: { ...reeseBassPreset.params, frequency: 55, filterFreq: 400, filterQ: 8, decay: 400 },
+      name: "Sub Kick",
+      params: { ...subBassPreset.params, frequency: 35, decay: 300 },
       muted: false,
       solo: false,
       volume: 0.7,
-      steps: [true, false, false, true, false, false, false, true, true, false, false, false, true, false, true, false]
+      steps: [true, false, false, false, true, false, false, false, false, false, true, false, true, false, false, true]
     });
   }
   
-  // Hoover stab for atmosphere
   if (hooverPreset) {
     newTracks.push({
       id: crypto.randomUUID(),
       name: "Hoover Stab",
-      params: { ...hooverPreset.params, frequency: 220, filterQ: 12, filterFreq: 1200, attack: 3, decay: 200 },
+      params: { ...hooverPreset.params, filterQ: 10, attack: 2 },
       muted: false,
       solo: false,
-      volume: 0.65,
+      volume: 0.7,
       steps: [false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false]
     });
   }
