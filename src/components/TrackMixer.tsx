@@ -171,27 +171,21 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
         <div className="ml-auto flex flex-col sm:flex-row gap-2">
           <Select value={selectedPreset} onValueChange={setSelectedPreset}>
             <SelectTrigger className="w-full sm:w-48 bg-secondary">
-              <SelectValue placeholder="Browse Presets" />
+              <SelectValue placeholder="Roland Presets" />
             </SelectTrigger>
             <SelectContent className="max-h-[400px]">
               {allPresets.map((preset, index) => {
-                const showCategoryHeader = index === 0 || preset.category !== allPresets[index - 1].category;
+                const showDivider = index > 0 && preset.category !== allPresets[index - 1].category;
                 return (
                   <div key={preset.name}>
-                    {showCategoryHeader && (
-                      <div className="px-2 py-2 text-xs font-semibold text-muted-foreground bg-muted/50 sticky top-0 z-10">
-                        <div className="flex items-center gap-2">
-                          <Badge variant={getCategoryBadgeVariant(preset.category)} className="text-xs">
-                            {getCategoryLabel(preset.category)}
-                          </Badge>
-                          <span className="uppercase tracking-wider">
-                            {preset.category.replace('-', ' ')}
-                          </span>
-                        </div>
+                    {showDivider && <div className="h-px bg-border my-1" />}
+                    <SelectItem value={preset.name}>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={getCategoryBadgeVariant(preset.category)} className="text-xs">
+                          {getCategoryLabel(preset.category)}
+                        </Badge>
+                        {preset.name}
                       </div>
-                    )}
-                    <SelectItem value={preset.name} className="pl-4">
-                      {preset.name}
                     </SelectItem>
                   </div>
                 );
@@ -256,23 +250,17 @@ export const TrackMixer = ({ tracks, onTracksChange, onTrackPlay, onTrackEdit, i
                       </SelectTrigger>
                       <SelectContent className="max-h-[400px]">
                         {allPresets.map((preset, index) => {
-                          const showCategoryHeader = index === 0 || preset.category !== allPresets[index - 1].category;
+                          const showDivider = index > 0 && preset.category !== allPresets[index - 1].category;
                           return (
                             <div key={preset.name}>
-                              {showCategoryHeader && (
-                                <div className="px-2 py-2 text-xs font-semibold text-muted-foreground bg-muted/50 sticky top-0 z-10">
-                                  <div className="flex items-center gap-2">
-                                    <Badge variant={getCategoryBadgeVariant(preset.category)} className="text-xs">
-                                      {getCategoryLabel(preset.category)}
-                                    </Badge>
-                                    <span className="uppercase tracking-wider">
-                                      {preset.category.replace('-', ' ')}
-                                    </span>
-                                  </div>
+                              {showDivider && <div className="h-px bg-border my-1" />}
+                              <SelectItem value={preset.name}>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant={getCategoryBadgeVariant(preset.category)} className="text-xs">
+                                    {getCategoryLabel(preset.category)}
+                                  </Badge>
+                                  {preset.name}
                                 </div>
-                              )}
-                              <SelectItem value={preset.name} className="pl-4">
-                                {preset.name}
                               </SelectItem>
                             </div>
                           );
